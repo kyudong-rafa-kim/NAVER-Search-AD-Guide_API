@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>쇼핑검색광고 API로 세팅 및 운영하기 — 네이버 검색광고 API 가이드</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">네이버 검색광고 API로 시작하기</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link">파워링크 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding.html">이해하기</a>
+        <a href="powerlink-api.html">API로 세팅 및 운영하기</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link active">쇼핑검색광고 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding.html">이해하기</a>
+        <a href="shopping-api.html">API로 세팅 및 운영하기</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-api.html" class="lang-active">한국어</a>
+        <a href="shopping-api-en.html">English</a>
+        <a href="shopping-api-zh.html">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">쇼핑검색광고 · API</div>
+  <h1>API로 세팅 및 운영하기</h1>
+  <p>Business Channel 조회부터 캠페인 생성, 광고그룹·소재 등록, 통계 조회까지 curl 예시와 함께 단계별로 안내합니다.</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>목차</h3>
+    <ul>
+      <li><a href="#ch1">CH 1. 파워링크 API와의 차이점</a></li>
+      <li><a href="#ch2">CH 2. 사전 준비</a></li>
+      <li class="sub"><a href="#ch2-1">Business Channel 조회</a></li>
+      <li class="sub"><a href="#ch2-2">Product Group 조회</a></li>
+      <li><a href="#ch3">CH 3. 핵심 워크플로우</a></li>
+      <li class="sub"><a href="#step1">STEP 1. 캠페인 생성</a></li>
+      <li class="sub"><a href="#step2">STEP 2. 광고그룹 생성</a></li>
+      <li class="sub"><a href="#step3">STEP 3. 소재(상품) 등록</a></li>
+      <li><a href="#ch4">CH 4. 소재 조회 및 수정</a></li>
+      <li><a href="#ch5">CH 5. 운영 API</a></li>
+      <li class="sub"><a href="#stats">통계 조회</a></li>
+      <li class="sub"><a href="#stat-reports">대용량 통계</a></li>
+      <li><a href="#ch6">CH 6. 운영 팁</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- CH 1 -->
+    <section class="section" id="ch1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        파워링크 API와의 차이점
+      </h2>
+
+      <div class="info-box">
+        💡 인증 방법, Base URL, 헤더 구조는 파워링크 API와 완전히 동일합니다. 캠페인 세팅 단계부터 쇼핑검색광고 고유의 설정이 필요합니다.
+      </div>
+
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead><tr><th>항목</th><th>파워링크</th><th>쇼핑검색광고</th></tr></thead>
+          <tbody>
+            <tr><td>Base URL</td><td><code>https://api.searchad.naver.com</code></td><td>동일</td></tr>
+            <tr><td>인증 방식</td><td>HMAC-SHA256</td><td>동일</td></tr>
+            <tr><td><code>campaignTp</code></td><td><code>WEB_SITE</code></td><td><code>SHOPPING</code></td></tr>
+            <tr><td>Ad type</td><td><code>TEXT_45</code></td><td><code>SHOPPING_PRODUCT_AD</code></td></tr>
+            <tr><td>키워드 등록</td><td>직접 등록 (POST /ncc/keywords)</td><td>시스템 자동매칭 — 별도 등록 없음</td></tr>
+            <tr><td>소재 기반</td><td>제목+설명 텍스트 직접 입력</td><td>CPS 입점을 통해 연동된 EP 상품 활용</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box" style="margin-top:16px;">
+        💡 <strong>EP란?</strong> 네이버 쇼핑 CPS 입점 시 연동되는 상품 피드(상품명·가격·카테고리·속성·이미지 등)입니다. 쇼핑검색광고는 이미 입점 과정에서 연동된 EP 상품 데이터를 광고 소재로 활용합니다. EP를 별도로 새로 연동할 필요는 없습니다.
+      </div>
+      <div class="warning-box" style="margin-top:12px;">
+        ⚠️ <strong>쇼핑검색광고 전용 EP를 별도로 운영하고 싶다면?</strong><br />
+        가격비교와 독립적으로 쇼핑검색광고를 운영하고 싶은 경우,
+        쇼핑검색광고 전용 EP를 별도로 생성하여 활용하는 방식을 선택할 수 있습니다.
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 2 -->
+    <section class="section" id="ch2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        사전 준비 — Business Channel &amp; Product Group 조회
+      </h2>
+
+      <p>캠페인 세팅 전, 광고 계정에 연결된 쇼핑 채널과 상품 그룹을 API로 먼저 조회해야 합니다.</p>
+
+      <!-- 2-1 -->
+      <div class="subsection" id="ch2-1">
+        <h3 class="subsection-title">2-1. Business Channel 조회 — GET /ncc/channels</h3>
+        <p>광고 계정에 연결된 쇼핑 채널(CPS 입점 완료 상태)을 조회합니다.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/channels" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">응답 예시:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>[
+  {
+    "nccBusinessChannelId": "ch-001",
+    "channelTp": "SITE",
+    "name": "내 쇼핑몰",
+    "pcInspectStatus": "APPROVED"
+  }
+]</code></pre>
+        </div>
+
+        <div class="warning-box" style="margin-top:12px;">
+          ⚠️ <code>pcInspectStatus</code>가 <code>APPROVED</code>인 채널만 광고에 사용할 수 있습니다.<br />
+          응답의 <code>nccBusinessChannelId</code>를 메모해 두세요 — 광고그룹 생성 시 <code>pcChannelId</code> / <code>mobileChannelId</code> 값으로 사용됩니다.
+        </div>
+      </div>
+
+      <!-- 2-2 -->
+      <div class="subsection" id="ch2-2">
+        <h3 class="subsection-title">2-2. Product Group 조회 — GET /ncc/product-groups</h3>
+        <p>CPS 입점 시 연동된 EP 상품들은 <strong>상품 그룹(Product Group)</strong> 단위로 관리됩니다. 광고그룹 생성 전, 계정에 등록된 상품 그룹 목록을 조회하여 <code>nccProductGroupId</code>를 확인합니다.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/product-groups" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">응답 예시:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>[
+  {
+    "nccProductGroupId": "pg-001",
+    "nccBusinessChannelId": "ch-001",
+    "mallId": "my-mall-001",
+    "mallName": "내 쇼핑몰",
+    "name": "전체 상품 그룹",
+    "brandName": "My Brand",
+    "registeredProductType": "GENERAL",
+    "registrationMethod": "WHOLE",
+    "numberOfAdgroups": 0
+  }
+]</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>필드</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccProductGroupId</code></td><td>상품 그룹 고유 ID — 광고그룹 생성 시 사용</td></tr>
+              <tr><td><code>nccBusinessChannelId</code></td><td>연결된 Business Channel ID</td></tr>
+              <tr><td><code>mallId</code> / <code>mallName</code></td><td>쇼핑몰 식별 정보</td></tr>
+              <tr><td><code>name</code></td><td>상품 그룹 이름</td></tr>
+              <tr><td><code>registeredProductType</code></td><td><code>GENERAL</code> (일반 상품) / <code>CATALOG</code> (카탈로그) / <code>BLOG</code></td></tr>
+              <tr><td><code>registrationMethod</code></td><td><code>WHOLE</code> (전체 등록) / <code>EACH</code> (선택 등록)</td></tr>
+              <tr><td><code>numberOfAdgroups</code></td><td>이 상품 그룹을 사용 중인 광고그룹 수</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box" style="margin-top:12px;">
+          💡 <code>nccProductGroupId</code>는 광고그룹 생성 시 연결할 상품 그룹을 지정하는 데 사용됩니다.
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 3 -->
+    <section class="section" id="ch3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        핵심 API 워크플로우 — 단계별 세팅
+      </h2>
+
+      <p>쇼핑검색광고 API 세팅 권장 순서:</p>
+      <div class="step-flow">
+        <div class="step-flow-item">
+          <span class="step-num">사전 조회</span>
+          Channel ID + Product Group ID 확인
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 1</span>
+          캠페인 생성
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 2</span>
+          광고그룹 생성
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 3</span>
+          소재(상품) 등록
+        </div>
+      </div>
+
+      <div class="info-box">
+        💡 키워드 등록 단계 없음 — EP 기반 시스템 자동매칭
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="subsection" id="step1">
+        <h3 class="subsection-title">STEP 1. 캠페인 생성 — POST /ncc/campaigns</h3>
+        <p>파워링크와 동일한 엔드포인트입니다. <code>campaignTp</code> 값만 <code>SHOPPING</code>으로 다릅니다.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/campaigns" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "campaignTp": "SHOPPING",
+    "name": "쇼핑검색광고_캠페인",
+    "dailyBudget": 100000,
+    "useDailyBudget": true
+  }'</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>파라미터</th><th>설명</th><th>쇼핑 설정값</th></tr></thead>
+            <tbody>
+              <tr><td><code>campaignTp</code></td><td>캠페인 유형</td><td><code>"SHOPPING"</code> (파워링크는 <code>"WEB_SITE"</code>)</td></tr>
+              <tr><td><code>name</code></td><td>캠페인 이름</td><td>자유 입력</td></tr>
+              <tr><td><code>dailyBudget</code></td><td>하루 예산 (원 단위)</td><td>예: <code>100000</code></td></tr>
+              <tr><td><code>useDailyBudget</code></td><td>하루 예산 사용 여부</td><td><code>true</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:12px;">응답에서 확인할 것:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>{
+  "nccCampaignId": "cmp-shop-001"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="subsection" id="step2">
+        <h3 class="subsection-title">STEP 2. 광고그룹 생성 — POST /ncc/adgroups</h3>
+        <p><strong>SKU 규모에 따라 그룹핑 전략이 달라집니다.</strong></p>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Case 1 — 카테고리별 그룹핑 (SKU 많은 경우)</h3>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">bash / curl</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/adgroups" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccCampaignId": "cmp-shop-001",
+    "pcChannelId": "{nccBusinessChannelId}",
+    "mobileChannelId": "{nccBusinessChannelId}",
+    "nccProductGroupId": "pg-001",
+    "name": "카테고리1_그룹",
+    "bidAmt": 200
+  }'</code></pre>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Case 2 — 핵심 키워드별 그룹핑 (SKU 적은 경우)</h3>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">bash / curl</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/adgroups" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccCampaignId": "cmp-shop-001",
+    "pcChannelId": "{nccBusinessChannelId}",
+    "mobileChannelId": "{nccBusinessChannelId}",
+    "nccProductGroupId": "pg-001",
+    "name": "핵심키워드1_그룹",
+    "bidAmt": 200
+  }'</code></pre>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>파라미터</th><th>설명</th><th>비고</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccCampaignId</code></td><td>STEP 1에서 받은 캠페인 ID</td><td>Required</td></tr>
+              <tr><td><code>pcChannelId</code></td><td>PC 비즈니스 채널 ID</td><td>Required — CHAPTER 2-1 응답의 <code>nccBusinessChannelId</code></td></tr>
+              <tr><td><code>mobileChannelId</code></td><td>모바일 비즈니스 채널 ID</td><td>Required — 동일 값 사용 가능</td></tr>
+              <tr><td><code>nccProductGroupId</code></td><td>상품 그룹 ID</td><td>CHAPTER 2-2 응답의 <code>nccProductGroupId</code></td></tr>
+              <tr><td><code>name</code></td><td>광고그룹 이름</td><td>그룹핑 전략에 맞게 명명</td></tr>
+              <tr><td><code>bidAmt</code></td><td>기본 입찰가 (원 단위, 70~100,000)</td><td>소재별 개별 설정도 가능</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:12px;">응답에서 확인할 것:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>{
+  "nccAdgroupId": "grp-shop-001"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="subsection" id="step3">
+        <h3 class="subsection-title">STEP 3. 소재(상품) 등록 — POST /ncc/ads</h3>
+        <p>쇼핑검색광고의 소재는 CPS 입점 시 연동된 EP 상품을 기반으로 생성됩니다. <code>type</code>을 <code>SHOPPING_PRODUCT_AD</code>로 지정하여 등록합니다. 소재별 입찰가는 <code>adAttr</code>의 <code>bidAmt</code>로 설정하며, 그룹 기본 입찰가를 따르려면 <code>useGroupBidAmt: true</code>로 설정합니다.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/ads" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccAdgroupId": "grp-shop-001",
+    "type": "SHOPPING_PRODUCT_AD",
+    "adAttr": {
+      "bidAmt": 200,
+      "useGroupBidAmt": false
+    }
+  }'</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>파라미터</th><th>설명</th><th>비고</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccAdgroupId</code></td><td>광고그룹 ID</td><td>STEP 2에서 획득</td></tr>
+              <tr><td><code>type</code></td><td>소재 유형</td><td><code>"SHOPPING_PRODUCT_AD"</code> 고정 (GitBook 확인, <code>GET /ncc/product-groups</code>)</td></tr>
+              <tr><td><code>adAttr.bidAmt</code></td><td>소재별 개별 입찰가</td><td>개별 입찰가 설정 시 사용</td></tr>
+              <tr><td><code>adAttr.useGroupBidAmt</code></td><td>그룹 기본 입찰가 사용 여부</td><td><code>true</code>이면 그룹 입찰가를 따름 (GitBook 확인)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box" style="margin-top:12px;">
+          💡 키워드는 별도로 등록하지 않습니다. EP 상품의 소재명·속성·카테고리 정보를 기반으로 시스템이 자동으로 관련 키워드에 매칭합니다.
+        </div>
+
+        <div class="warning-box" style="margin-top:12px;">
+          ⚠️ 추가 홍보문구 등 소재 상세 커스텀 필드는 GitBook Reference에 <code>SHOPPING_PRODUCT_AD</code> 타입의 <code>ad</code> 오브젝트 스키마가 별도 문서화되어 있지 않습니다. 상세 구현 시 네이버 검색광고 API 공식 가이드를 확인하세요.
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 4 -->
+    <section class="section" id="ch4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        소재 조회 및 수정
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">소재 전체 조회 — GET /ncc/ads</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/ads?nccAdgroupId=grp-shop-001" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">소재 입찰가 수정 — PUT /ncc/ads/{nccAdId}</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X PUT "https://api.searchad.naver.com/ncc/ads/{nccAdId}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "adAttr": {
+      "bidAmt": 300,
+      "useGroupBidAmt": false
+    }
+  }'</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 5 -->
+    <section class="section" id="ch5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        운영 API — 조회·수정·통계
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">캠페인/그룹 상태 관리</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>작업</th><th>Method</th><th>엔드포인트</th></tr></thead>
+            <tbody>
+              <tr><td>캠페인 전체 조회</td><td>GET</td><td><code>/ncc/campaigns</code></td></tr>
+              <tr><td>캠페인 일시정지</td><td>PUT</td><td><code>/ncc/campaigns/{id}</code></td></tr>
+              <tr><td>광고그룹 조회</td><td>GET</td><td><code>/ncc/adgroups</code></td></tr>
+              <tr><td>광고그룹 입찰가 수정</td><td>PUT</td><td><code>/ncc/adgroups/{id}</code></td></tr>
+              <tr><td>소재 조회</td><td>GET</td><td><code>/ncc/ads</code></td></tr>
+              <tr><td>소재 수정</td><td>PUT</td><td><code>/ncc/ads/{id}</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:16px;">캠페인 일시정지 예시:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X PUT "https://api.searchad.naver.com/ncc/campaigns/{campaignId}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{"userLock": true}'</code></pre>
+        </div>
+
+        <p style="margin-top:16px;">광고그룹 입찰가 수정 예시:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X PUT "https://api.searchad.naver.com/ncc/adgroups/{adgroupId}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{"bidAmt": 300}'</code></pre>
+        </div>
+      </div>
+
+      <!-- 통계 조회 -->
+      <div class="subsection" id="stats">
+        <h3 class="subsection-title">통계 조회 — GET /stats</h3>
+        <p>파워링크와 동일한 엔드포인트를 사용합니다.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/stats?id={캠페인ID 또는 그룹ID 또는 소재ID}&fields=[\"clkCnt\",\"impCnt\",\"salesAmt\",\"convCnt\"]&timeRange={\"since\":\"2026-04-01\",\"until\":\"2026-04-10\"}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">쇼핑검색광고에서 주요하게 볼 지표:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>지표 필드명</th><th>의미</th><th>쇼핑에서 중요한 이유</th></tr></thead>
+            <tbody>
+              <tr><td><code>impCnt</code></td><td>노출수</td><td>자동매칭 범위 확인</td></tr>
+              <tr><td><code>clkCnt</code></td><td>클릭수</td><td>소재 CTR 판단</td></tr>
+              <tr><td><code>salesAmt</code></td><td>광고비</td><td>예산 소진 확인</td></tr>
+              <tr><td><code>ctr</code></td><td>클릭률</td><td>소재 매력도 판단</td></tr>
+              <tr><td><code>convCnt</code></td><td>전환수</td><td>실구매 연결 여부</td></tr>
+              <tr><td><code>convAmt</code></td><td>전환 매출액</td><td>ROAS 계산 기반</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 대용량 통계 -->
+      <div class="subsection" id="stat-reports">
+        <h3 class="subsection-title">대용량 통계 — /stat-reports</h3>
+        <p>조회 기간이 길거나 데이터 양이 많을 때 비동기 리포트 방식을 사용합니다:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">흐름</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>Step 1. POST /stat-reports  → 리포트 생성 요청 → reportId 획득
+Step 2. GET  /stat-reports/{reportId}  → 상태 확인 (WAITING → RUNNING → DONE)
+Step 3. DONE 상태 → 리포트 다운로드 URL에서 CSV 파일 다운로드</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 6 -->
+    <section class="section" id="ch6">
+      <h2 class="section-title">
+        <span class="section-num">6</span>
+        API 운영 팁 — 쇼핑검색광고 특화
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">소재 품질이 곧 노출 범위</h3>
+        <p>쇼핑검색광고는 키워드를 직접 등록하지 않으므로, 상품 정보의 품질이 노출 범위를 결정합니다:</p>
+        <ul class="bullet-list">
+          <li>상품명에 핵심 키워드를 풍부하게 포함 → 더 많은 키워드에 자동 매칭</li>
+          <li>카테고리를 정확하게 설정 → 관련 검색어 매칭 정확도 향상</li>
+          <li>추가 홍보문구는 항상 입력 → CTR 향상의 가장 빠른 방법</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">그룹별 입찰가 분리 관리</h3>
+        <p>SKU가 많은 경우, 그룹별로 입찰가를 다르게 설정하여 예산을 효율적으로 운영합니다:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code># 고마진 카테고리 그룹 → 높은 입찰가
+curl -X PUT "https://api.searchad.naver.com/ncc/adgroups/{고마진그룹ID}" \
+  -d '{"bidAmt": 500}'
+
+# 일반 카테고리 그룹 → 낮은 입찰가
+curl -X PUT "https://api.searchad.naver.com/ncc/adgroups/{일반그룹ID}" \
+  -d '{"bidAmt": 150}'</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">API 호출 시 주의사항</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>항목</th><th>내용</th></tr></thead>
+            <tbody>
+              <tr><td>Timestamp 유효 시간</td><td>서버 시간 기준 <strong>±300초(5분) 이내</strong></td></tr>
+              <tr><td>요청 제한 (Rate Limit)</td><td>초당 요청 수 제한 있음 — 과도한 호출 시 <code>429</code> 오류</td></tr>
+              <tr><td>배열 등록 한도</td><td>소재 배열형 POST 시 1회 최대 <strong>100개</strong> 권장</td></tr>
+              <tr><td>productId 확인</td><td>쇼핑파트너센터에서 정확한 상품 ID 확인 후 사용</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">주요 에러 코드</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>HTTP 코드</th><th>의미</th><th>해결 방법</th></tr></thead>
+            <tbody>
+              <tr><td><code style="color:#e74c3c;">400</code></td><td>잘못된 요청 (파라미터 오류)</td><td>campaignTp, productId 등 파라미터 확인</td></tr>
+              <tr><td><code style="color:#e74c3c;">401</code></td><td>인증 실패</td><td>Signature 생성 로직 재확인</td></tr>
+              <tr><td><code style="color:#e74c3c;">403</code></td><td>권한 없음</td><td>Channel 연동 상태(APPROVED) 확인</td></tr>
+              <tr><td><code style="color:#e74c3c;">404</code></td><td>리소스 없음</td><td>ID 값 확인</td></tr>
+              <tr><td><code style="color:#e74c3c;">429</code></td><td>호출 한도 초과</td><td>요청 빈도 줄이기</td></tr>
+              <tr><td><code style="color:#e74c3c;">500</code></td><td>서버 오류</td><td>잠시 후 재시도</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Java / PHP / C# 샘플 코드</strong><br />
+        다른 언어 샘플은 GitBook 공식 문서(<a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>)를 참고하세요.
+      </div>
+    </section>
+
+    <!-- Back -->
+    <div style="margin-top:40px;text-align:center;">
+      <a href="shopping-understanding.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text-sub);transition:.15s;">
+        ← 쇼핑검색광고 이해하기로 돌아가기
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API 공식 문서: <a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    광고 시스템: <a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

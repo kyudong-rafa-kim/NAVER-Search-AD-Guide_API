@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started with Naver Search Ads API</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index-en.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">Naver Search Ads API Guide</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link">Powerlink <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding-en.html">Overview</a>
+        <a href="powerlink-api-en.html">API Setup &amp; Operations</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link">Shopping Search Ads <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding-en.html">Overview</a>
+        <a href="shopping-api-en.html">API Setup &amp; Operations</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="index.html">한국어</a>
+        <a href="index-en.html" class="lang-active">English</a>
+        <a href="index-zh.html">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">NAVER Search Ads · Official Guide</div>
+    <h1>Naver Search Ads,<br /><span class="accent">Get Started with API</span></h1>
+    <p>A guide to Powerlink &amp; Shopping Search Ads for beginners getting started with the Naver Search Ads API.</p>
+    <div class="hero-search">
+      <div class="search-wrap">
+        <input type="search" id="siteSearch" class="search-input"
+          placeholder="Search guide content... (e.g., bidding, campaign, API key)"
+          autocomplete="off" spellcheck="false" />
+        <button class="search-btn" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="searchResults" class="search-results-panel"></div>
+
+<!-- Cards -->
+<div class="index-content">
+  <div class="index-intro">
+    <h2>What would you like to learn?</h2>
+    <p>Jump to your desired section from the cards below. Each product is organized into two parts: <strong>Concepts</strong> and <strong>API Operations</strong>.</p>
+  </div>
+
+  <div class="card-grid">
+    <!-- Powerlink -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🔗</div>
+        <h3>Powerlink</h3>
+        <p>Keyword CPC ads at the top of Naver integrated search results</p>
+      </div>
+      <div class="card-body">
+        <ul class="card-links">
+          <li>
+            <a href="powerlink-understanding-en.html">
+              <span>📖</span>
+              <span>Powerlink Overview</span>
+              <span class="link-arrow">→</span>
+            </a>
+          </li>
+          <li>
+            <a href="powerlink-api-en.html">
+              <span>⚙️</span>
+              <span>API Setup &amp; Operations</span>
+              <span class="link-arrow">→</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Shopping Search Ads -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🛍️</div>
+        <h3>Shopping Search Ads</h3>
+        <p>Product ads displayed in Naver Shopping search results</p>
+      </div>
+      <div class="card-body">
+        <ul class="card-links">
+          <li>
+            <a href="shopping-understanding-en.html">
+              <span>📖</span>
+              <span>Shopping Search Ads Overview</span>
+              <span class="link-arrow">→</span>
+            </a>
+          </li>
+          <li>
+            <a href="shopping-api-en.html">
+              <span>⚙️</span>
+              <span>API Setup &amp; Operations</span>
+              <span class="link-arrow">→</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick summary -->
+  <div style="margin-top:48px;">
+    <div class="highlight-box">
+      <strong>📌 Content Sources</strong><br />
+      All content is cited from Naver's official product documentation and the
+      <a href="https://naver.github.io/searchad-apidoc" target="_blank">Naver Search Ads API GitBook</a>.
+      No unofficial sources are included.
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      API Docs: <a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+      &nbsp;|&nbsp;
+      Naver Integrated Advertiser Center: <a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

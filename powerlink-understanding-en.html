@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Understanding Powerlink — Naver Search Ads API Guide</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index-en.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">Naver Search Ads API Guide</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link active">Powerlink <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding-en.html">Overview</a>
+        <a href="powerlink-api-en.html">API Setup &amp; Operations</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link">Shopping Search Ads <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding-en.html">Overview</a>
+        <a href="shopping-api-en.html">API Setup &amp; Operations</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding.html">한국어</a>
+        <a href="powerlink-understanding-en.html" class="lang-active">English</a>
+        <a href="powerlink-understanding-zh.html">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">Powerlink</div>
+  <h1>Understanding Powerlink</h1>
+  <p>A comprehensive overview of Naver Search Ads fundamentals, campaign structure, ad creative strategy, keyword types, ADVoost AI broad match, and optimization metrics.</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>Contents</h3>
+    <ul>
+      <li><a href="#section1">SECTION 1. What is Powerlink?</a></li>
+      <li><a href="#section2">SECTION 2. Campaign Structure</a></li>
+      <li><a href="#section3">SECTION 3. Ad Creative</a></li>
+      <li class="sub"><a href="#section3-rsa">Responsive Search Ads (RSA)</a></li>
+      <li class="sub"><a href="#section3-ext">13 Ad Extension Types</a></li>
+      <li><a href="#section4">SECTION 4. Keywords</a></li>
+      <li><a href="#section5">SECTION 5. ADVoost Broad Match</a></li>
+      <li><a href="#section6">SECTION 6. Ad Performance Metrics</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- SECTION 1 -->
+    <section class="section" id="section1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        What is Powerlink?
+      </h2>
+
+      <div class="highlight-box">
+        <strong>Core message:</strong> Powerlink is a keyword-based <strong>CPC ad</strong> that appears at the top of Naver search results.
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Details</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Official name</td><td>Site Search Ads (commonly known as: Powerlink, Keyword Search Ads)</td></tr>
+            <tr><td>Placement</td><td>Top of Naver integrated search results (PC + Mobile)</td></tr>
+            <tr><td>Billing</td><td>CPC (Cost Per Click) — charged only when a click occurs</td></tr>
+            <tr><td>Domestic market share</td><td><strong>65%</strong> of search ad market</td></tr>
+            <tr><td>Nationwide reach</td><td>Reaches <strong>71%</strong> of domestic internet users</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Core Advantages of Powerlink</h3>
+        <ul class="bullet-list">
+          <li>Ads appear at the exact moment a user with clear purchase intent performs a search</li>
+          <li>Exposure is free; only clicks cost money → budget-efficient</li>
+          <li>Runs on both Naver PC + Mobile simultaneously with no separate setup needed</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 2 -->
+    <section class="section" id="section2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        Campaign Structure
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">4-Level Account Structure</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">Structure</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>Account
+  └── Campaign               ← Ad objective unit
+        └── Ad Group         ← Strategy unit (targeting / bidding / budget)
+              ├── Ad Creative
+              ├── Keywords
+              └── Landing URL</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Campaign</h3>
+        <ul class="bullet-list">
+          <li><strong>Role:</strong> Top-level advertising objective unit</li>
+          <li><strong>Recommended:</strong> One business goal = one campaign</li>
+          <li><strong>Settings:</strong> Campaign name, daily budget limit, scheduling</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Ad Group</h3>
+        <ul class="bullet-list">
+          <li><strong>Role:</strong> Strategy unit — keywords + creatives sharing the same targeting and bid strategy</li>
+          <li><strong>Settings:</strong> Device targeting (PC/mobile), region targeting, day/time targeting, base bid</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 3 -->
+    <section class="section" id="section3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        Ad Creative
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">3 Components of an Ad Creative</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Component</th><th>Description</th><th>Character limit</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>① Headline</td><td>Core message of the ad; the first impression that drives clicks</td><td><strong>15 chars max</strong></td></tr>
+              <tr><td>② Description</td><td>Detailed product/service description; call-to-action copy</td><td><strong>45 chars max</strong></td></tr>
+              <tr><td>③ Ad Extensions</td><td>Display additional information to increase ad size and CTR</td><td>Varies by type</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RSA -->
+      <div class="subsection" id="section3-rsa">
+        <h3 class="subsection-title">Responsive Search Ads (RSA)</h3>
+        <div class="highlight-box">
+          <strong>Core concept:</strong> Register multiple headlines and descriptions, and <strong>Naver AI automatically selects the best combination</strong> for display.
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Category</th><th>Basic Creative</th><th>Responsive Search Ad (RSA)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Headlines registered</td><td>1</td><td>Up to <strong>15</strong></td></tr>
+              <tr><td>Descriptions registered</td><td>1</td><td>Up to <strong>4</strong></td></tr>
+              <tr><td>Selection method</td><td>Fixed</td><td>AI auto-combination</td></tr>
+              <tr><td>CTR improvement</td><td>Baseline</td><td><strong>+12% improvement</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">RSA Tips</h3>
+          <ul class="bullet-list">
+            <li>Write 15 headlines from different angles (price-focused, benefit-focused, urgency-focused, etc.)</li>
+            <li>AI selects the best combination in real time based on the search query and user context</li>
+            <li>After performance data accumulates, continuously optimize by replacing low-performing headlines</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5 principles -->
+      <div class="subsection">
+        <h3 class="subsection-title">5 Principles for Effective Ad Creatives</h3>
+        <ol class="steps-list">
+          <li><strong>Include keywords:</strong> naturally include the search term in the headline → appears bold, attracts attention</li>
+          <li><strong>Present clear benefits:</strong> use specific figures like "free shipping", "same-day dispatch", "30% off"</li>
+          <li><strong>Highlight differentiators:</strong> state unique strengths that set you apart from competitors</li>
+          <li><strong>Include a clear CTA:</strong> specific action prompts like "Check now", "Free consultation", "Buy now"</li>
+          <li><strong>Match the landing page:</strong> what you promise in the ad must actually exist on the landing page</li>
+        </ol>
+      </div>
+
+      <!-- Extensions -->
+      <div class="subsection" id="section3-ext">
+        <h3 class="subsection-title">Ad Extensions — 13 Types</h3>
+        <p>Beyond the basic creative (headline + description), extensions display additional information to increase ad size and improve CTR.</p>
+
+        <div class="subsection">
+          <h3 class="subsection-title">4 Essential Ad Extensions (for top placement)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Rank</th><th>Type</th><th>Description</th><th>Effect</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td><strong>Sub-links</strong></td><td>4 direct links to key pages within the site</td><td>2x ad size, reduced bounce rate</td></tr>
+                <tr><td>2</td><td><strong>Promotional Text</strong></td><td>1 additional line for core brand/product message</td><td>Message reinforcement</td></tr>
+                <tr><td>3</td><td><strong>Powerlink Image</strong></td><td>Image displayed alongside the ad (right side on PC)</td><td>Increased visual attention</td></tr>
+                <tr><td>4</td><td><strong>Additional Headline</strong></td><td>1 auxiliary headline below the main title</td><td>Increased information density</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Image + Description Extensions — Best Performing Type:</strong><br />
+          Up to <strong>14x CTR improvement</strong> (compared to ads without images)<br />
+          Applicable types: Powerlink Image, Image Sub-links, Image Promotional Text
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">All 13 Ad Extension Types</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Type</th><th>Primary Use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>Sub-links</td><td>Direct links to specific pages within the site</td></tr>
+                <tr><td>2</td><td>Promotional Text</td><td>Highlight key marketing message</td></tr>
+                <tr><td>3</td><td>Powerlink Image</td><td>Brand/product representative image</td></tr>
+                <tr><td>4</td><td>Additional Headline</td><td>Auxiliary headline</td></tr>
+                <tr><td>5</td><td>Phone Number</td><td>Direct phone call on click</td></tr>
+                <tr><td>6</td><td>Location</td><td>Store address and map integration</td></tr>
+                <tr><td>7</td><td>Calculator</td><td>Insurance/loan calculation widget</td></tr>
+                <tr><td>8</td><td>Price List</td><td>Direct product pricing display</td></tr>
+                <tr><td>9</td><td>Site Link</td><td>Additional landing page connections</td></tr>
+                <tr><td>10</td><td>Image Sub-links</td><td>Image + link combination</td></tr>
+                <tr><td>11</td><td>Image Promotional Text</td><td>Image + text combination</td></tr>
+                <tr><td>12</td><td>Video</td><td>Product video display</td></tr>
+                <tr><td>13</td><td>Place</td><td>Naver Place integration</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Day/Time Targeting for Extensions</h3>
+          <p>Ad extensions can be configured to display differently by day and time slot.</p>
+          <ul class="bullet-list">
+            <li>Weekday mornings → "Same-day shipping available" promotional text</li>
+            <li>Weekends → "Weekend special event" promotional text</li>
+            <li>During business hours only → Phone Number extension displayed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 4 -->
+    <section class="section" id="section4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        Keywords
+      </h2>
+      <p class="text-small" style="margin-bottom:16px;">Source: NAVER_파워링크101_2512_FINAL.pdf official classification</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">3 Keyword Types</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Type</th><th>Search Volume</th><th>CPC</th><th>Conversion Rate (CVR)</th><th>Primary Purpose</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Short-tail</strong></td><td>High</td><td>High</td><td>Low</td><td>Brand awareness, top placement</td></tr>
+              <tr><td><strong>Long-tail</strong></td><td>Low</td><td>Low</td><td>High</td><td>Purchase conversion, budget efficiency</td></tr>
+              <tr><td><strong>Seasonal</strong></td><td>Spikes during season</td><td>Rises during season</td><td>Season-dependent</td><td>Capture seasonal demand</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Short-tail Keywords</h3>
+        <ul class="bullet-list">
+          <li>e.g., "sneakers", "insurance", "travel"</li>
+          <li>High search volume but includes users with unclear purchase intent</li>
+          <li>High CPC, budget drains quickly → use primarily for brand awareness</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Long-tail Keywords</h3>
+        <ul class="bullet-list">
+          <li>e.g., "Nike Air Force white size 270 men's", "diabetes insurance for men in their 30s"</li>
+          <li>Low search volume but users have clear purchase intent</li>
+          <li>Low CPC and high conversion rate → best ROI efficiency</li>
+          <li><strong>Recommended first for beginners</strong></li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Seasonal Keywords</h3>
+        <ul class="bullet-list">
+          <li>e.g., "Valentine's Day gift ideas", "post-CSAT travel", "summer air conditioner recommendations"</li>
+          <li>Search volume spikes during specific seasons or events</li>
+          <li>Register <strong>2–4 weeks before</strong> the season to allow quality stabilization before maximizing exposure</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Keyword Research Methods</h3>
+        <ul class="bullet-list">
+          <li><strong>Naver Ad System keyword tool:</strong> check monthly search volume, competition level, and recommended bid</li>
+          <li><strong>API:</strong> use the <code>/keywordstool</code> endpoint to collect large-scale keyword search volume data</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 5 -->
+    <section class="section" id="section5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        ADVoost Search — AI-Powered Broad Match
+      </h2>
+      <p class="text-small" style="margin-bottom:16px;">Source: [Naver] ADVoost검색_플레이북_25년7월.pdf · As of April 2026: officially live</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">What is ADVoost Search?</h3>
+
+        <div class="warning-box">
+          <strong>Limitation of traditional Powerlink:</strong><br />
+          Ads only appear for keywords directly registered by the advertiser → if a searcher uses different terms, the ad is not shown
+        </div>
+
+        <div class="highlight-box">
+          <strong>ADVoost Search innovation:</strong><br />
+          Naver AI analyzes the relevance between the search query and the landing page, and automatically shows ads for keywords the advertiser hasn't registered
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">Comparison</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>[Traditional method]
+Search: "Nike Air Max discount" → keyword must be registered → not shown if not registered
+
+[ADVoost method]
+Search: "Nike Air Max discount" → AI analyzes landing page
+→ relevant content found on page → automatically shown</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Why ADVoost Makes SEO Important</h3>
+        <p>ADVoost's crawler reads the landing page and judges the relevance between the page topic and the search query.</p>
+        <ul class="bullet-list">
+          <li>Better SEO on landing page → AI shows ads for more related keywords</li>
+          <li>Poor SEO (text rendered as images, unnecessary redirects, etc.) → harder to benefit from ADVoost</li>
+          <li><strong>For Powerlink advertisers, SEO is now essential, not optional</strong></li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">ADVoost Broad Match Performance (vs. exact match baseline)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Metric</th><th>Change</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CPC</td><td style="color:#e74c3c;font-weight:700;">↓ 400%</td></tr>
+              <tr><td>CTR</td><td style="color:#03C75A;font-weight:700;">↑ 340%</td></tr>
+              <tr><td>ROI</td><td style="color:#03C75A;font-weight:700;">↑ 430%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Voost Page — 7-Step Landing Page SEO Optimization</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Step</th><th>Item</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Allow crawling</strong></td><td>Set Yeti (Naver's crawler) access permission in robots.txt</td></tr>
+              <tr><td>2</td><td><strong>Remove Fragment URLs</strong></td><td>URLs with <code>#</code> are hard for crawlers to read → recommend removing</td></tr>
+              <tr><td>3</td><td><strong>Review redirects</strong></td><td>Remove unnecessary redirects; link directly to the final URL</td></tr>
+              <tr><td>4</td><td><strong>Include brand keywords in title tag</strong></td><td>Include key keywords in the <code>&lt;title&gt;</code> tag</td></tr>
+              <tr><td>5</td><td><strong>Write Meta Description as a sentence</strong></td><td>Use natural sentences, not keyword lists</td></tr>
+              <tr><td>6</td><td><strong>Separate image and text</strong></td><td>Don't render text as images; display as HTML text</td></tr>
+              <tr><td>7</td><td><strong>Link Premium Log Analysis</strong></td><td>Install the Naver ad conversion tracking script</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 6 -->
+    <section class="section" id="section6">
+      <h2 class="section-title">
+        <span class="section-num">6</span>
+        Ad Performance Metrics
+      </h2>
+      <p class="text-small" style="margin-bottom:8px;">As of April 2026</p>
+
+      <div class="warning-box">
+        ⚠️ <strong>The Quality Index was deprecated in 2026.</strong> It is replaced by the following two new metrics.
+      </div>
+
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Meaning</th><th>How to improve</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Ad Relevance Index</strong></td>
+              <td>Relevance score between the search query and the ad (creative + landing page)</td>
+              <td>Maintain consistency between keyword-creative-landing page; optimize SEO</td>
+            </tr>
+            <tr>
+              <td><strong>Click Expectancy Index</strong></td>
+              <td>Predicted probability that the ad will be clicked</td>
+              <td>Improve creative quality, register ad extensions thoroughly, use RSA</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-box" style="margin-top:16px;">
+        When both indices are high:<br />
+        <ul class="bullet-list" style="margin-top:8px;">
+          <li>Can secure higher positions at the same bid</li>
+          <li>Effective reduction in actual CPC</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Next Page -->
+    <div style="margin-top:40px;padding:24px;background:var(--bg-alt);border-radius:var(--radius);border:1px solid var(--border);text-align:center;">
+      <p style="margin-bottom:14px;font-weight:600;color:var(--text);">Now that you understand Powerlink, move on to the next step.</p>
+      <a href="powerlink-api-en.html" class="hero-cta" style="display:inline-flex;">API Setup &amp; Operations →</a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API Docs: <a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    Ad System: <a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Powerlink概念介绍 — Naver搜索广告API指南</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index-zh.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">Naver搜索广告API入门指南</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link active">Powerlink <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding-zh.html">概念介绍</a>
+        <a href="powerlink-api-zh.html">API设置与运营</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link">购物搜索广告 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding-zh.html">概念介绍</a>
+        <a href="shopping-api-zh.html">API设置与运营</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding.html">한국어</a>
+        <a href="powerlink-understanding-en.html">English</a>
+        <a href="powerlink-understanding-zh.html" class="lang-active">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">Powerlink</div>
+  <h1>Powerlink概念介绍</h1>
+  <p>全面介绍Naver搜索广告基础知识、广告系列结构、广告素材策略、关键词类型、ADVoost AI广泛匹配及广告优化指标。</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>目录</h3>
+    <ul>
+      <li><a href="#section1">第1节. 什么是Powerlink？</a></li>
+      <li><a href="#section2">第2节. 广告系列结构</a></li>
+      <li><a href="#section3">第3节. 广告素材</a></li>
+      <li class="sub"><a href="#section3-rsa">响应式搜索广告（RSA）</a></li>
+      <li class="sub"><a href="#section3-ext">13种广告附加信息</a></li>
+      <li><a href="#section4">第4节. 关键词</a></li>
+      <li><a href="#section5">第5节. ADVoost广泛匹配</a></li>
+      <li><a href="#section6">第6节. 广告优化指标</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- SECTION 1 -->
+    <section class="section" id="section1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        什么是Powerlink？
+      </h2>
+
+      <div class="highlight-box">
+        <strong>核心要点：</strong>Powerlink是基于关键词的<strong>CPC广告</strong>，展示在Naver搜索结果最顶部。
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>项目</th><th>内容</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>官方名称</td><td>网站搜索广告（通称：Powerlink、关键词搜索广告）</td></tr>
+            <tr><td>展示位置</td><td>Naver综合搜索结果最顶部（PC + 移动端）</td></tr>
+            <tr><td>收费方式</td><td>CPC（Cost Per Click）——仅在发生点击时收费</td></tr>
+            <tr><td>国内市场占有率</td><td>搜索广告市场<strong>65%</strong></td></tr>
+            <tr><td>全国覆盖率</td><td>覆盖<strong>71%</strong>的国内互联网用户</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Powerlink的核心优势</h3>
+        <ul class="bullet-list">
+          <li>在购买意向明确的用户进行搜索的精准时刻展示广告</li>
+          <li>曝光本身免费，仅点击时产生费用 → 预算效率高</li>
+          <li>Naver PC + 移动端同时运营，无需单独设置即可双端同时展示</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 2 -->
+    <section class="section" id="section2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        广告系列结构
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">4级账户结构</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">结构图</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>账户（Account）
+  └── 广告系列（Campaign）        ← 广告目标单位
+        └── 广告组（Ad Group）    ← 策略单位（定向/出价/预算）
+              ├── 广告素材（Ad Creative）
+              ├── 关键词（Keywords）
+              └── 着陆页URL（Landing URL）</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">广告系列（Campaign）</h3>
+        <ul class="bullet-list">
+          <li><strong>作用：</strong>广告的最高级目标单位</li>
+          <li><strong>建议：</strong>一个业务目标 = 一个广告系列</li>
+          <li><strong>设置项：</strong>广告系列名称、每日预算上限、投放时间设置</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">广告组（Ad Group）</h3>
+        <ul class="bullet-list">
+          <li><strong>作用：</strong>策略单位——共享相同定向和出价策略的关键词与素材集合</li>
+          <li><strong>设置项：</strong>设备定向（PC/移动端）、地区定向、星期/时间定向、基础出价</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 3 -->
+    <section class="section" id="section3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        广告素材
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">广告素材的3个组成要素</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>组成要素</th><th>说明</th><th>字数限制</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>① 标题（Headline）</td><td>广告核心信息，引导点击的第一印象</td><td><strong>最多15字</strong></td></tr>
+              <tr><td>② 描述（Description）</td><td>产品/服务详细说明、行动召唤文案</td><td><strong>最多45字</strong></td></tr>
+              <tr><td>③ 广告附加信息</td><td>展示附加信息，扩大广告尺寸并提升点击率</td><td>各类型不同</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RSA -->
+      <div class="subsection" id="section3-rsa">
+        <h3 class="subsection-title">响应式搜索广告（RSA）</h3>
+        <div class="highlight-box">
+          <strong>核心概念：</strong>注册多个标题和描述后，<strong>Naver AI自动选择最优组合</strong>进行展示。
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>区分</th><th>基础素材</th><th>响应式搜索广告（RSA）</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>标题注册数量</td><td>1个</td><td>最多<strong>15个</strong></td></tr>
+              <tr><td>描述注册数量</td><td>1个</td><td>最多<strong>4个</strong></td></tr>
+              <tr><td>组合方式</td><td>固定</td><td>AI自动组合</td></tr>
+              <tr><td>点击率提升</td><td>基准</td><td><strong>提升12%</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">RSA运用技巧</h3>
+          <ul class="bullet-list">
+            <li>从不同角度撰写15个标题（价格强调型、优惠强调型、紧迫感强调型等）</li>
+            <li>AI根据搜索词和用户情境实时选择最优组合</li>
+            <li>积累效果数据后，通过替换低效标题持续优化</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5 principles -->
+      <div class="subsection">
+        <h3 class="subsection-title">高效广告素材撰写的5大原则</h3>
+        <ol class="steps-list">
+          <li><strong>包含关键词：</strong>在标题中自然融入搜索词 → 以粗体显示，吸引注意</li>
+          <li><strong>明确传递优惠：</strong>使用"免运费"、"当日发货"、"7折优惠"等具体数字</li>
+          <li><strong>强调差异化亮点：</strong>明确写出与竞争对手不同的独特优势</li>
+          <li><strong>加入行动召唤语（CTA）：</strong>"立即查看"、"免费咨询"、"马上购买"等明确引导行动</li>
+          <li><strong>与着陆页内容一致：</strong>广告中承诺的内容必须在着陆页上实际存在</li>
+        </ol>
+      </div>
+
+      <!-- Extensions -->
+      <div class="subsection" id="section3-ext">
+        <h3 class="subsection-title">广告附加信息 — 13种类型</h3>
+        <p>在基础素材（标题+描述）之外展示附加信息，扩大广告尺寸并提升点击率的功能。</p>
+
+        <div class="subsection">
+          <h3 class="subsection-title">4种必备广告附加信息（最顶部展示标准）</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>排名</th><th>类型</th><th>说明</th><th>效果</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td><strong>子链接</strong></td><td>直接跳转至网站内主要页面的4个链接</td><td>广告尺寸扩大2倍，降低跳出率</td></tr>
+                <tr><td>2</td><td><strong>宣传文案</strong></td><td>品牌/产品核心信息额外增加1行</td><td>强化核心信息</td></tr>
+                <tr><td>3</td><td><strong>Powerlink图片</strong></td><td>在广告中展示图片（PC端显示在右侧区域）</td><td>提升视觉关注度</td></tr>
+                <tr><td>4</td><td><strong>附加标题</strong></td><td>在主标题下方追加1行副标题</td><td>增加信息量</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>图片+描述型广告附加信息 — 最高效类型：</strong><br />
+          点击率最高可提升<strong>14倍</strong>（与无图片广告相比）<br />
+          适用类型：Powerlink图片、图片型子链接、图片型宣传文案
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">13种广告附加信息完整列表</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>编号</th><th>类型</th><th>主要用途</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>子链接</td><td>直接链接到网站内特定页面</td></tr>
+                <tr><td>2</td><td>宣传文案</td><td>突出核心营销信息</td></tr>
+                <tr><td>3</td><td>Powerlink图片</td><td>品牌/产品代表图片</td></tr>
+                <tr><td>4</td><td>附加标题</td><td>副标题</td></tr>
+                <tr><td>5</td><td>电话号码</td><td>点击即可直接拨打电话</td></tr>
+                <tr><td>6</td><td>位置信息</td><td>门店地址及地图联动</td></tr>
+                <tr><td>7</td><td>计算器</td><td>保险费/贷款等计算功能</td></tr>
+                <tr><td>8</td><td>价格表</td><td>直接展示各商品价格</td></tr>
+                <tr><td>9</td><td>网站链接</td><td>追加着陆页链接</td></tr>
+                <tr><td>10</td><td>图片型子链接</td><td>图片+链接组合</td></tr>
+                <tr><td>11</td><td>图片型宣传文案</td><td>图片+文案组合</td></tr>
+                <tr><td>12</td><td>视频</td><td>展示产品视频</td></tr>
+                <tr><td>13</td><td>Place</td><td>Naver Place联动</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">广告附加信息的星期/时间定向</h3>
+          <p>广告附加信息可按星期和时间段设置不同的展示配置。</p>
+          <ul class="bullet-list">
+            <li>工作日上午 → "当日配送可用"宣传文案</li>
+            <li>周末 → "周末特惠活动"宣传文案</li>
+            <li>仅营业时间 → 展示电话号码广告附加信息</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 4 -->
+    <section class="section" id="section4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        关键词
+      </h2>
+      <p class="text-small" style="margin-bottom:16px;">来源：NAVER_파워링크101_2512_FINAL.pdf官方分类标准</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">3种关键词类型</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>类型</th><th>搜索量</th><th>CPC</th><th>转化率（CVR）</th><th>主要目的</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>短尾关键词</strong>（Short-tail）</td><td>高</td><td>高</td><td>低</td><td>品牌认知、顶部展示</td></tr>
+              <tr><td><strong>长尾关键词</strong>（Long-tail）</td><td>低</td><td>低</td><td>高</td><td>购买转化、预算效率</td></tr>
+              <tr><td><strong>季节性关键词</strong>（Seasonal）</td><td>季节性飙升</td><td>季节性上涨</td><td>时间依赖</td><td>抢占季节性需求</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">短尾关键词</h3>
+        <ul class="bullet-list">
+          <li>例：「运动鞋」、「保险」、「旅游」</li>
+          <li>搜索量大但包含购买意向不明确的用户</li>
+          <li>CPC高，预算消耗快 → 主要用于品牌认知目的</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">长尾关键词</h3>
+        <ul class="bullet-list">
+          <li>例：「耐克Air Force白色270男款」、「30岁男性糖尿病保险推荐」</li>
+          <li>搜索量少但用户购买意向明确</li>
+          <li>CPC低，转化率高 → ROI效率最优</li>
+          <li><strong>优先推荐给初级广告主</strong></li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">季节性关键词</h3>
+        <ul class="bullet-list">
+          <li>例：「情人节礼物推荐」、「高考后旅游」、「夏季空调推荐」</li>
+          <li>特定季节/活动期间搜索量急剧增加的关键词</li>
+          <li>在季节来临<strong>提前2-4周</strong>注册，稳定质量后实现最大化曝光</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">关键词发掘方法</h3>
+        <ul class="bullet-list">
+          <li><strong>Naver广告系统内关键词工具：</strong>可查看月搜索量、竞争程度、推荐出价</li>
+          <li><strong>API活用：</strong>通过<code>/keywordstool</code>端点批量获取关键词搜索量数据</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 5 -->
+    <section class="section" id="section5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        ADVoost搜索 — AI智能广泛匹配
+      </h2>
+      <p class="text-small" style="margin-bottom:16px;">来源：[Naver] ADVoost검색_플레이북_25년7월.pdf · 截至2026年4月：正式运营中</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">什么是ADVoost搜索？</h3>
+
+        <div class="warning-box">
+          <strong>传统Powerlink的局限：</strong><br />
+          广告仅对广告主直接注册的关键词展示 → 搜索者使用其他表达方式时，广告无法展示
+        </div>
+
+        <div class="highlight-box">
+          <strong>ADVoost搜索的创新：</strong><br />
+          Naver AI分析搜索词与着陆页之间的关联性，自动将广告展示给广告主未注册的关键词
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">对比</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>【传统方式】
+搜索词：「耐克Air Max折扣」→ 需要注册关键词 → 未注册时广告不展示
+
+【ADVoost方式】
+搜索词：「耐克Air Max折扣」→ AI分析着陆页
+→ 页面包含相关内容 → 自动展示广告</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">ADVoost使SEO变得重要的原因</h3>
+        <p>ADVoost的爬虫读取着陆页，判断页面主题与搜索词的关联性。</p>
+        <ul class="bullet-list">
+          <li>着陆页SEO越好 → AI在更多相关关键词上展示广告</li>
+          <li>SEO不佳的页面（文字全部以图片形式存在、不必要的重定向等） → 难以获得ADVoost的优势</li>
+          <li><strong>对于Powerlink广告主来说，SEO现已成为必选项而非可选项</strong></li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">ADVoost广泛匹配效果数据（与精确匹配相比）</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>指标</th><th>变化</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CPC</td><td style="color:#e74c3c;font-weight:700;">↓ 400%</td></tr>
+              <tr><td>CTR</td><td style="color:#03C75A;font-weight:700;">↑ 340%</td></tr>
+              <tr><td>ROI</td><td style="color:#03C75A;font-weight:700;">↑ 430%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Voost Page — 着陆页SEO优化7步骤</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>步骤</th><th>项目</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>允许爬取</strong></td><td>在robots.txt中允许Yeti（Naver爬虫）访问</td></tr>
+              <tr><td>2</td><td><strong>去除Fragment URL</strong></td><td>含<code>#</code>的URL爬虫难以读取 → 建议去除</td></tr>
+              <tr><td>3</td><td><strong>检查重定向</strong></td><td>去除不必要的重定向，直接链接到最终URL</td></tr>
+              <tr><td>4</td><td><strong>在Title标签中包含品牌关键词</strong></td><td>在<code>&lt;title&gt;</code>标签中包含核心关键词</td></tr>
+              <tr><td>5</td><td><strong>以句子形式撰写Meta Description</strong></td><td>使用自然句子而非关键词堆叠</td></tr>
+              <tr><td>6</td><td><strong>分离图片与文字</strong></td><td>不要将文字处理成图片，以HTML文本形式展示</td></tr>
+              <tr><td>7</td><td><strong>接入高级日志分析</strong></td><td>安装Naver广告转化追踪脚本</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 6 -->
+    <section class="section" id="section6">
+      <h2 class="section-title">
+        <span class="section-num">6</span>
+        广告优化指标
+      </h2>
+      <p class="text-small" style="margin-bottom:8px;">截至2026年4月</p>
+
+      <div class="warning-box">
+        ⚠️ <strong>质量评分（Quality Index）已于2026年废止。</strong>以下两项新指标取而代之。
+      </div>
+
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr><th>指标</th><th>含义</th><th>提升方法</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>广告相关性指数</strong></td>
+              <td>搜索词与广告（素材+着陆页）的关联性得分</td>
+              <td>保持关键词-素材-着陆页的一致性，优化SEO</td>
+            </tr>
+            <tr>
+              <td><strong>预期点击率指数</strong></td>
+              <td>预测该广告被点击的可能性得分</td>
+              <td>提升素材质量，充分注册广告附加信息，活用RSA</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-box" style="margin-top:16px;">
+        两项指数越高：<br />
+        <ul class="bullet-list" style="margin-top:8px;">
+          <li>在相同出价下可获得更高排名</li>
+          <li>实质性地降低CPC</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Next Page -->
+    <div style="margin-top:40px;padding:24px;background:var(--bg-alt);border-radius:var(--radius);border:1px solid var(--border);text-align:center;">
+      <p style="margin-bottom:14px;font-weight:600;color:var(--text);">了解完Powerlink概念后，进入下一步。</p>
+      <a href="powerlink-api-zh.html" class="hero-cta" style="display:inline-flex;">API设置与运营 →</a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API官方文档：<a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    广告系统：<a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

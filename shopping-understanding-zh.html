@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>购物搜索广告概念介绍 — Naver搜索广告API入门指南</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index-zh.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">Naver搜索广告API入门指南</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link">Powerlink <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding-zh.html">概念介绍</a>
+        <a href="powerlink-api-zh.html">API设置与运营</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link active">购物搜索广告 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding-zh.html">概念介绍</a>
+        <a href="shopping-api-zh.html">API设置与运营</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding.html">한국어</a>
+        <a href="shopping-understanding-en.html">English</a>
+        <a href="shopping-understanding-zh.html" class="lang-active">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">购物搜索广告</div>
+  <h1>购物搜索广告概念介绍</h1>
+  <p>全面了解购物搜索广告——在用户购买意愿最高的时刻触达目标客户，涵盖核心概念、关键词自动匹配、广告系列结构及素材策略。</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>目录</h3>
+    <ul>
+      <li><a href="#section1">SECTION 1. 什么是购物搜索广告？</a></li>
+      <li><a href="#section2">SECTION 2. 关键词自动匹配</a></li>
+      <li><a href="#section3">SECTION 3. 广告系列结构</a></li>
+      <li class="sub"><a href="#section3-case1">Case 1. SKU较多</a></li>
+      <li class="sub"><a href="#section3-case2">Case 2. SKU较少</a></li>
+      <li><a href="#section4">SECTION 4. 广告素材构成要素</a></li>
+      <li><a href="#section5">SECTION 5. 最佳广告素材指南</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- SECTION 1 -->
+    <section class="section" id="section1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        什么是购物搜索广告？
+      </h2>
+
+      <div class="highlight-box">
+        <strong>核心要点：</strong>在消费决策后半程——即<strong>用户购买意愿最高的时刻</strong>——展示的广告
+      </div>
+
+      <p>在Naver购物和搜索中，向正在寻找商品的用户展示您的商品的广告产品。</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">电商用户购买旅程（Customer Journey）</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>阶段</th><th>行为</th><th>广告类型</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1. 认知</td><td>通过横幅/视频广告了解商品</td><td>DA（展示广告）</td></tr>
+              <tr><td>2. 探索</td><td>在Naver搜索商品信息/评价</td><td>Powerlink等</td></tr>
+              <tr><td><strong>3. 比较</strong></td><td>在Naver购物搜索、比价</td><td><strong>购物搜索广告 ← 此处</strong></td></tr>
+              <tr><td>4. 购买</td><td>选定最终商品并完成购买</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">购物搜索广告的核心价值</h3>
+        <p>同时满足"卖家"与"用户"的需求：</p>
+        <ul class="bullet-list">
+          <li><strong>卖家：</strong>将商品展示给购买意向高的用户</li>
+          <li><strong>用户：</strong>在搜索结果中直接发现所需商品</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 2 -->
+    <section class="section" id="section2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        关键词自动匹配 — 与Powerlink的核心区别
+      </h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>类别</th><th>说明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Powerlink</strong></td><td>广告主手动注册关键词</td></tr>
+            <tr><td><strong>购物搜索广告</strong></td><td>系统根据商品信息自动匹配关键词</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block-wrap" style="margin-top:20px;">
+        <div class="code-block-header">
+          <span class="lang-label">结构图</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre class="language-text"><code>购物合作中心商品信息
+  (商品名 + 属性 + 类目)
+          ↓
+    关键词自动匹配（系统）
+          ↓
+  自动在相关搜索词下展示广告</code></pre>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">实际示例</h3>
+        <ul class="bullet-list">
+          <li><strong>商品名：</strong>"动物福利无抗生素受精蛋 20/40/60颗 ₩12,000"</li>
+          <li><strong>自动匹配关键词：</strong>鸡蛋、大蛋、受精蛋、动物福利鸡蛋、无抗生素鸡蛋、动物福利受精蛋、受精蛋40颗、20颗鸡蛋</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        💡 商品名和属性填写得越准确、越丰富，系统自动匹配的相关关键词就越多。
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 3 -->
+    <section class="section" id="section3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        广告系列结构
+      </h2>
+
+      <p>结构：<strong>广告系列 → 广告组 → 商品/素材</strong>（3层级）</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">基于SKU规模的分组策略</h3>
+        <p>根据店铺类型和商品构成，选择以下两种分组策略之一：</p>
+
+        <div class="subsection" id="section3-case1">
+          <h3 class="subsection-title">Case 1. SKU较多（经销商、综合购物商城）</h3>
+          <p>策略：按类目分组——按品类划分广告组，使各类商品各自出现在对应的核心关键词下</p>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">结构图</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-text"><code>广告系列 (MO/PC)
+  ├── 广告组：品牌       → 商品 A、D、G
+  ├── 广告组：类目1      → 商品 A、B、C
+  ├── 广告组：类目2      → 商品 D、E、F
+  └── 广告组：类目3      → 商品 G、H、I</code></pre>
+          </div>
+        </div>
+
+        <div class="subsection" id="section3-case2">
+          <h3 class="subsection-title">Case 2. SKU较少（单一品类店铺）</h3>
+          <p>策略：按核心关键词分组——将热门商品素材A匹配到多个核心关键词</p>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">结构图</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-text"><code>广告系列 (MO/PC)
+  ├── 广告组：品牌              → 商品 A、D、G
+  ├── 广告组：通用核心关键词1    → 商品 A、B、C
+  ├── 广告组：通用核心关键词2    → 商品 A、E、F
+  └── 广告组：通用核心关键词3    → 商品 A、H、I</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 4 -->
+    <section class="section" id="section4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        广告素材构成要素
+      </h2>
+
+      <div class="highlight-box">
+        <strong>基本原则：</strong>购物搜索广告的素材直接来源于EP（商品数据源）中登记的商品信息。对CTR影响最大的4个要素可在素材层级进行自定义设置。
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">基本要素</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>编号</th><th>要素</th><th>CTR影响</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>①</td><td><strong>商品图片</strong></td><td>⭐ 高</td><td>吸引人的图片——必须清晰展示商品USP</td></tr>
+              <tr><td>②</td><td><strong>商品名称</strong></td><td>⭐ 高</td><td>商品名称中必须包含核心关键词</td></tr>
+              <tr><td>③</td><td>价格</td><td>中等</td><td>设定有竞争力的价格</td></tr>
+              <tr><td>④</td><td>Naver Pay积分</td><td>中等</td><td>被视为额外价格优惠</td></tr>
+              <tr><td>⑤</td><td><strong>附加推广文案</strong></td><td>⭐ 高</td><td>填写促销及额外折扣信息</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">附加信息</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>编号</th><th>要素</th><th>CTR影响</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>⑥</td><td><strong>评价/购买/收藏数</strong></td><td>⭐ 高</td><td>根据评价/购买量自动同步</td></tr>
+              <tr><td>⑦</td><td>官方店铺徽章</td><td>中等</td><td>凭借官方认证店铺标识提升可信度</td></tr>
+              <tr><td>⑧</td><td>卖家</td><td>中等</td><td>准确设置以确保品牌关键词匹配</td></tr>
+              <tr><td>⑨</td><td>配送信息</td><td>中等</td><td>利用配送服务提升顾客信任</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="info-box">
+        💡 <strong>对CTR影响最大的4个要素：</strong>① 商品图片、② 商品名称、⑤ 附加推广文案、⑥ 评价/购买/收藏数
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 5 -->
+    <section class="section" id="section5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        最佳广告素材指南
+      </h2>
+
+      <div class="highlight-box">
+        打造高CTR购物搜索广告最佳素材的<strong>2大原则</strong>：
+        <ol class="bullet-list" style="margin-top:8px;">
+          <li>与竞品相比更为突出的图片 &amp; 商品名称</li>
+          <li>善用附加推广文案 &amp; 购物商品补充信息，强调您的店铺独有差异化优势</li>
+        </ol>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Worst vs. Best 对比</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>类别</th><th>特征</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:#e74c3c;">Worst</strong></td>
+                <td>商品USP不够清晰的图片 / 除商品名称外无其他要素强调</td>
+              </tr>
+              <tr>
+                <td><strong style="color:#03C75A;">Best</strong></td>
+                <td>
+                  ① USP清晰的图片（例：厚实、坚韧、腰部舒适）<br />
+                  ② 通过附加推广文案强调差异化优势<br />
+                  ③ 展示购物补充信息（星级评分、评价数、收藏数）
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next Page -->
+    <div style="margin-top:40px;padding:24px;background:var(--bg-alt);border-radius:var(--radius);border:1px solid var(--border);text-align:center;">
+      <p style="margin-bottom:14px;font-weight:600;color:var(--text);">了解购物搜索广告的概念后，请进入下一步。</p>
+      <a href="shopping-api-zh.html" class="hero-cta" style="display:inline-flex;">API设置与运营 →</a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API官方文档：<a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    广告系统：<a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

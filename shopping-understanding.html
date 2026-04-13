@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>쇼핑검색광고 이해하기 — 네이버 검색광고 API 가이드</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">네이버 검색광고 API로 시작하기</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link">파워링크 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding.html">이해하기</a>
+        <a href="powerlink-api.html">API로 세팅 및 운영하기</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link active">쇼핑검색광고 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding.html">이해하기</a>
+        <a href="shopping-api.html">API로 세팅 및 운영하기</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding.html" class="lang-active">한국어</a>
+        <a href="shopping-understanding-en.html">English</a>
+        <a href="shopping-understanding-zh.html">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">쇼핑검색광고</div>
+  <h1>쇼핑검색광고 이해하기</h1>
+  <p>구매 의사가 가장 높은 순간에 노출되는 쇼핑검색광고의 개념, 키워드 자동매칭, 캠페인 구조, 소재 전략까지 한눈에 정리합니다.</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>목차</h3>
+    <ul>
+      <li><a href="#section1">SECTION 1. 쇼핑검색광고란?</a></li>
+      <li><a href="#section2">SECTION 2. 키워드 자동매칭</a></li>
+      <li><a href="#section3">SECTION 3. 캠페인 구조</a></li>
+      <li class="sub"><a href="#section3-case1">Case 1. SKU 많은 경우</a></li>
+      <li class="sub"><a href="#section3-case2">Case 2. SKU 적은 경우</a></li>
+      <li><a href="#section4">SECTION 4. 소재 구성 요소</a></li>
+      <li><a href="#section5">SECTION 5. Best Creative 가이드</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- SECTION 1 -->
+    <section class="section" id="section1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        쇼핑검색광고란?
+      </h2>
+
+      <div class="highlight-box">
+        <strong>핵심 메시지:</strong> 가격을 비교하고 구매를 고려하는 의사 결정 과정의 후반부 — <strong>고객의 구매 의사가 가장 높은 시점</strong>에 노출되는 광고
+      </div>
+
+      <p>네이버 쇼핑과 검색에서 필요 물품을 찾는 이용자에게 자사 상품을 노출해주는 광고 상품입니다.</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">커머스 고객 구매 여정 (Customer Journey)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>단계</th><th>행동</th><th>광고 유형</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1. 인지</td><td>배너/영상 광고로 상품을 인지</td><td>DA (디스플레이 광고)</td></tr>
+              <tr><td>2. 탐색</td><td>네이버 검색으로 상품 정보/후기 탐색</td><td>파워링크 등</td></tr>
+              <tr><td><strong>3. 비교</strong></td><td>네이버 쇼핑에서 상품 검색, 가격 비교</td><td><strong>쇼핑검색광고 ← 여기</strong></td></tr>
+              <tr><td>4. 구매</td><td>최종 상품 선택 및 구매</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">쇼핑검색광고의 핵심 가치</h3>
+        <p>'판매자'와 '사용자'의 욕구를 동시에 충족합니다:</p>
+        <ul class="bullet-list">
+          <li><strong>판매자:</strong> 자사 상품을 구매 의향이 높은 사용자에게 노출</li>
+          <li><strong>사용자:</strong> 원하는 상품을 검색 결과에서 바로 발견</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 2 -->
+    <section class="section" id="section2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        키워드 자동매칭 — 파워링크와의 핵심 차이
+      </h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>구분</th><th>내용</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>파워링크</strong></td><td>광고주가 키워드를 직접 등록</td></tr>
+            <tr><td><strong>쇼핑검색광고</strong></td><td>상품 정보를 기반으로 시스템이 키워드를 자동 매칭</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block-wrap" style="margin-top:20px;">
+        <div class="code-block-header">
+          <span class="lang-label">구조도</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre class="language-text"><code>쇼핑파트너센터 상품 정보
+  (소재명 + 속성 + 카테고리)
+          ↓
+    키워드 자동매칭 (시스템)
+          ↓
+  관련 검색어에 광고 자동 노출</code></pre>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">실제 예시</h3>
+        <ul class="bullet-list">
+          <li><strong>상품명:</strong> "동물복지 무항생제 유정란 20·40·60구 12,000원"</li>
+          <li><strong>자동 매칭 키워드:</strong> 달걀, 대란, 유정란, 동물복지계란, 무항생계란, 동물복지유정란, 유정란40구, 20구 계란</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        💡 상품명과 속성을 정확하고 풍부하게 입력할수록 더 많은 관련 키워드에 자동 노출됩니다.
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 3 -->
+    <section class="section" id="section3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        캠페인 구조
+      </h2>
+
+      <p>구조: <strong>캠페인 → 그룹 → 상품/소재</strong> (3단계)</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">SKU 규모에 따른 그룹핑 전략</h3>
+        <p>쇼핑몰 형태와 판매 상품에 따라 두 가지 그룹핑 전략을 선택합니다:</p>
+
+        <div class="subsection" id="section3-case1">
+          <h3 class="subsection-title">Case 1. SKU가 많은 경우 (유통사, 종합 쇼핑몰)</h3>
+          <p>전략: 카테고리별 그룹핑 — 다양한 상품이 각각의 핵심 키워드에 노출될 수 있도록 카테고리별로 그룹 구성</p>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">구조도</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-text"><code>캠페인 (MO/PC)
+  ├── 그룹: 브랜드     → 상품 A, D, G
+  ├── 그룹: 카테고리1  → 상품 A, B, C
+  ├── 그룹: 카테고리2  → 상품 D, E, F
+  └── 그룹: 카테고리3  → 상품 G, H, I</code></pre>
+          </div>
+        </div>
+
+        <div class="subsection" id="section3-case2">
+          <h3 class="subsection-title">Case 2. SKU가 적은 경우 (단일 카테고리 쇼핑몰)</h3>
+          <p>전략: 핵심 키워드별 그룹핑 — 인기 상품 소재 A를 다수의 핵심 키워드에 매칭</p>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">구조도</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-text"><code>캠페인 (MO/PC)
+  ├── 그룹: 브랜드           → 상품 A, D, G
+  ├── 그룹: 일반 핵심 키워드1  → 상품 A, B, C
+  ├── 그룹: 일반 핵심 키워드2  → 상품 A, E, F
+  └── 그룹: 일반 핵심 키워드3  → 상품 A, H, I</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 4 -->
+    <section class="section" id="section4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        소재 구성 요소
+      </h2>
+
+      <div class="highlight-box">
+        <strong>기본 원칙:</strong> 쇼핑검색광고의 소재는 EP(상품피드) 내 등록된 정보를 그대로 가져옵니다. CTR에 영향을 가장 크게 주는 요소는 4가지이며, 소재 단에서 커스텀하여 노출할 수 있습니다.
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">기본 요소</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>번호</th><th>요소</th><th>CTR 영향</th><th>설명</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>①</td><td><strong>상품 이미지</strong></td><td>⭐ 높음</td><td>매력적인 이미지 — USP가 명확히 드러나야 함</td></tr>
+              <tr><td>②</td><td><strong>상품명</strong></td><td>⭐ 높음</td><td>상품 내 핵심 키워드 포함 필수</td></tr>
+              <tr><td>③</td><td>가격</td><td>보통</td><td>경쟁력 있는 가격 설정</td></tr>
+              <tr><td>④</td><td>네이버페이 포인트</td><td>보통</td><td>추가 가격 혜택으로 인지</td></tr>
+              <tr><td>⑤</td><td><strong>추가 홍보문구</strong></td><td>⭐ 높음</td><td>프로모션 및 추가 할인 정보 기입</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">추가 정보</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>번호</th><th>요소</th><th>CTR 영향</th><th>설명</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>⑥</td><td><strong>리뷰/구매/찜 수</strong></td><td>⭐ 높음</td><td>리뷰/구매 규모에 따라 연동</td></tr>
+              <tr><td>⑦</td><td>공식몰 뱃지</td><td>보통</td><td>공식 스토어 인증으로 공신력 어필</td></tr>
+              <tr><td>⑧</td><td>판매처</td><td>보통</td><td>브랜드 키워드 매칭을 위해 정확히 설정</td></tr>
+              <tr><td>⑨</td><td>배송정보</td><td>보통</td><td>배송 서비스를 활용하여 고객 신뢰도 제고</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="info-box">
+        💡 <strong>CTR에 가장 크게 영향을 주는 4가지:</strong> ① 상품 이미지, ② 상품명, ⑤ 추가 홍보문구, ⑥ 리뷰/구매/찜 수
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 5 -->
+    <section class="section" id="section5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        Best Creative 가이드
+      </h2>
+
+      <div class="highlight-box">
+        높은 CTR을 만드는 쇼핑검색광고 Best Creative <strong>2원칙</strong>:
+        <ol class="bullet-list" style="margin-top:8px;">
+          <li>타사 대비 눈에 띄는 이미지 &amp; 상품명</li>
+          <li>내 스토어만의 차별화 포인트를 강조할 수 있는 추가홍보문구 &amp; 쇼핑 상품 부가 정보 활용</li>
+        </ol>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Worst vs. Best 비교</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>구분</th><th>특징</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:#e74c3c;">Worst</strong></td>
+                <td>상품의 USP가 잘 드러나지 않는 이미지 / 상품명 외 추가 요소 강조 없음</td>
+              </tr>
+              <tr>
+                <td><strong style="color:#03C75A;">Best</strong></td>
+                <td>
+                  ① USP가 명확한 이미지 (예: 두꺼운, 탄탄한, 허리가 편안한)<br />
+                  ② 추가 홍보문구로 차별화 포인트 강조<br />
+                  ③ 쇼핑 부가 정보(별점, 리뷰 수, 찜 개수) 노출
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next Page -->
+    <div style="margin-top:40px;padding:24px;background:var(--bg-alt);border-radius:var(--radius);border:1px solid var(--border);text-align:center;">
+      <p style="margin-bottom:14px;font-weight:600;color:var(--text);">쇼핑검색광고 개념을 이해했다면, 다음 단계로 이동하세요.</p>
+      <a href="shopping-api.html" class="hero-cta" style="display:inline-flex;">API로 세팅 및 운영하기 →</a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API 공식 문서: <a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    광고 시스템: <a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

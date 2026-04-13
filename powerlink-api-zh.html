@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Powerlink API设置与运营 — Naver搜索广告API指南</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index-zh.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">Naver搜索广告API入门指南</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link active">Powerlink <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding-zh.html">概念介绍</a>
+        <a href="powerlink-api-zh.html">API设置与运营</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link">购物搜索广告 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding-zh.html">概念介绍</a>
+        <a href="shopping-api-zh.html">API设置与运营</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-api.html">한국어</a>
+        <a href="powerlink-api-en.html">English</a>
+        <a href="powerlink-api-zh.html" class="lang-active">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">Powerlink · API</div>
+  <h1>API设置与运营</h1>
+  <p>结合curl示例，从API授权申请、认证、广告系列创建、广告素材与关键词注册到统计查询，逐步详细说明。</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>目录</h3>
+    <ul>
+      <li><a href="#ch1">第1章. API授权申请</a></li>
+      <li><a href="#ch2">第2章. API基础结构</a></li>
+      <li><a href="#ch3">第3章. 认证（Authentication）</a></li>
+      <li><a href="#ch4">第4章. 核心工作流程</a></li>
+      <li class="sub"><a href="#precondition">前期准备. 查询Business Channel</a></li>
+      <li class="sub"><a href="#step1">STEP 1. 创建广告系列</a></li>
+      <li class="sub"><a href="#step2">STEP 2. 创建广告组</a></li>
+      <li class="sub"><a href="#step3">STEP 3. 注册广告素材</a></li>
+      <li class="sub"><a href="#step4">STEP 4. 注册关键词</a></li>
+      <li><a href="#ch5">第5章. 运营API</a></li>
+      <li class="sub"><a href="#stats">统计查询</a></li>
+      <li class="sub"><a href="#keywordstool">关键词搜索量</a></li>
+      <li class="sub"><a href="#bid">出价估算</a></li>
+      <li><a href="#ch6">第6章. 广告附加信息API</a></li>
+      <li><a href="#ch7">第7章. 运营技巧</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- CH 1 -->
+    <section class="section" id="ch1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        前期准备 — API授权申请
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">必要条件核查清单</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>项目</th><th>内容</th></tr></thead>
+            <tbody>
+              <tr><td>Naver广告账户</td><td>需要至少存在一个网站搜索广告（Powerlink）广告系列</td></tr>
+              <tr><td>API授权</td><td>需要在广告系统内单独申请</td></tr>
+              <tr><td>授权信息</td><td><code>API KEY</code>（X-API-KEY）、<code>SECRET KEY</code>（用于生成签名）、<code>Customer ID</code>（X-Customer）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">API授权申请步骤</h3>
+        <ol class="steps-list">
+          <li>登录Naver广告系统（<a href="https://searchad.naver.com" target="_blank">searchad.naver.com</a>）</li>
+          <li>点击右上角 [我的信息] → [API管理]</li>
+          <li>点击 [申请API授权] 按钮</li>
+          <li>同意服务条款后完成申请</li>
+          <li>在页面上查看并保存API KEY / SECRET KEY</li>
+        </ol>
+        <div class="warning-box">
+          ⚠️ <strong>SECRET KEY仅在授权时显示一次。</strong>请务必保存在安全的地方。
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 2 -->
+    <section class="section" id="ch2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        API基础结构
+      </h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>项目</th><th>值</th></tr></thead>
+          <tbody>
+            <tr><td>Base URL</td><td><code>https://api.searchad.naver.com</code></td></tr>
+            <tr><td>协议</td><td>REST API</td></tr>
+            <tr><td>数据格式</td><td>JSON</td></tr>
+            <tr><td>编码</td><td>UTF-8</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">整体请求结构</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">结构图</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>https://api.searchad.naver.com/{资源路径}
+  └── HTTP Method: GET / POST / PUT / DELETE
+  └── Headers: 4个认证信息（必填）
+  └── Body: JSON（POST/PUT请求时）</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 3 -->
+    <section class="section" id="ch3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        认证（Authentication）
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">4个必填请求头</h3>
+        <p>所有API请求必须包含以下4个请求头：</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>请求头名称</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td><code>X-Timestamp</code></td><td>当前时间（Unix timestamp，毫秒）</td></tr>
+              <tr><td><code>X-API-KEY</code></td><td>已申请的API KEY</td></tr>
+              <tr><td><code>X-Customer</code></td><td>广告主Customer ID</td></tr>
+              <tr><td><code>X-Signature</code></td><td>HMAC-SHA256签名值</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">签名（Signature）生成公式</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">签名公式</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>签名目标字符串 = {timestamp} + "." + {HTTP_METHOD} + "." + {request_uri}
+
+X-Signature = Base64( HMAC-SHA256( SECRET_KEY, 签名目标字符串 ) )</code></pre>
+        </div>
+
+        <p style="margin-top:14px;"><strong>示例：</strong></p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">示例</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>timestamp = 1712800000000
+method    = GET
+uri       = /ncc/campaigns
+
+签名目标 = "1712800000000.GET./ncc/campaigns"
+X-Signature = Base64(HMAC-SHA256(SECRET_KEY, "1712800000000.GET./ncc/campaigns"))</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">curl实际请求示例</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/campaigns" \
+  -H "X-Timestamp: 1712800000000" \
+  -H "X-API-KEY: {已申请的API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {生成的签名值}" \
+  -H "Content-Type: application/json"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">响应示例（200 OK）：</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>[
+  {
+    "nccCampaignId": "cmp-001",
+    "campaignTp": "WEB_SITE",
+    "name": "品牌广告系列",
+    "status": "ELIGIBLE",
+    "dailyBudget": 100000
+  }
+]</code></pre>
+        </div>
+
+        <div class="info-box">
+          💡 <strong>初学者提示：</strong>curl无需安装额外程序，可直接在Mac/Linux终端、Windows PowerShell中使用。
+        </div>
+
+        <div class="info-box">
+          <strong>Java / PHP / C# 示例代码</strong><br />
+          其他语言的示例请参考GitBook官方文档（<a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>）。
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 4 -->
+    <section class="section" id="ch4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        核心API工作流程 — 分步设置
+      </h2>
+
+      <p>推荐顺序：</p>
+      <div class="step-flow">
+        <div class="step-flow-item">
+          <span class="step-num">前期准备</span>
+          确认Business Channel ID
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 1</span>
+          创建广告系列
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 2</span>
+          创建广告组
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 3</span>
+          注册广告素材
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 4</span>
+          注册关键词
+        </div>
+      </div>
+
+      <!-- Pre-check -->
+      <div class="subsection" id="precondition">
+        <h3 class="subsection-title">前期准备. 查询Business Channel — GET /ncc/channels</h3>
+        <p>首先确认创建广告组时必需的<code>pcChannelId</code> / <code>mobileChannelId</code>值。</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/channels" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+        <div class="info-box" style="margin-top:12px;">
+          💡 从响应中记录<code>channelTp</code>为<code>SITE</code>的渠道的<code>nccBusinessChannelId</code>。此值将用于STEP 2的<code>pcChannelId</code> / <code>mobileChannelId</code>。
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="subsection" id="step1">
+        <h3 class="subsection-title">STEP 1. 创建广告系列 — POST /ncc/campaigns</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/campaigns" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "campaignTp": "WEB_SITE",
+    "name": "品牌广告系列",
+    "dailyBudget": 100000,
+    "useDailyBudget": true
+  }'</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>参数</th><th>说明</th><th>示例值</th></tr></thead>
+            <tbody>
+              <tr><td><code>campaignTp</code></td><td>广告系列类型（Powerlink = WEB_SITE固定）</td><td><code>"WEB_SITE"</code></td></tr>
+              <tr><td><code>name</code></td><td>广告系列名称</td><td><code>"品牌广告系列"</code></td></tr>
+              <tr><td><code>dailyBudget</code></td><td>每日预算（韩元单位）</td><td><code>100000</code></td></tr>
+              <tr><td><code>useDailyBudget</code></td><td>是否使用每日预算</td><td><code>true</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:12px;">响应中需要确认的内容：</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>{
+  "nccCampaignId": "cmp-abc123"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="subsection" id="step2">
+        <h3 class="subsection-title">STEP 2. 创建广告组 — POST /ncc/adgroups</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/adgroups" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccCampaignId": "cmp-abc123",
+    "name": "品牌关键词_组",
+    "bidAmt": 1000,
+    "pcChannelId": "{nccBusinessChannelId}",
+    "mobileChannelId": "{nccBusinessChannelId}"
+  }'</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top:12px;">
+          💡 <code>pcChannelId</code>与<code>mobileChannelId</code>使用Business Channel API（<code>GET /ncc/channels</code>）查询获取的<code>nccBusinessChannelId</code>值。WEB_SITE广告系列中，请输入SITE类型的渠道ID。
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>参数</th><th>说明</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccCampaignId</code></td><td>STEP 1获取的广告系列ID</td><td>必填</td></tr>
+              <tr><td><code>name</code></td><td>广告组名称</td><td>必填</td></tr>
+              <tr><td><code>pcChannelId</code></td><td>PC Business Channel ID</td><td>必填 — <code>GET /ncc/channels</code>响应中的<code>nccBusinessChannelId</code></td></tr>
+              <tr><td><code>mobileChannelId</code></td><td>移动端Business Channel ID</td><td>必填 — 可使用相同值</td></tr>
+              <tr><td><code>bidAmt</code></td><td>基础出价（韩元，70~100,000）</td><td>未填写时默认值为70</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="subsection" id="step3">
+        <h3 class="subsection-title">STEP 3. 注册广告素材 — POST /ncc/ads</h3>
+        <p>素材内容需<strong>嵌套在<code>"ad"</code>对象内部</strong>传递，而非放在最顶层。</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/ads" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccAdgroupId": "grp-xyz456",
+    "type": "TEXT_45",
+    "ad": {
+      "headline": "官方商城最高7折优惠",
+      "description": "立即购买免运费。限今日特惠！",
+      "pc": {
+        "final": "https://www.brandstore.com/sale"
+      },
+      "mobile": {
+        "final": "https://m.brandstore.com/sale"
+      }
+    }
+  }'</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>参数</th><th>说明</th><th>限制</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccAdgroupId</code></td><td>广告组ID（必填）</td><td>从STEP 2获取</td></tr>
+              <tr><td><code>type</code></td><td>素材类型（必填）</td><td><code>"TEXT_45"</code>固定</td></tr>
+              <tr><td><code>ad.headline</code></td><td>广告标题</td><td>1~15字</td></tr>
+              <tr><td><code>ad.description</code></td><td>广告描述</td><td>20~45字</td></tr>
+              <tr><td><code>ad.pc.final</code></td><td>PC目标URL</td><td><code>https://</code>或<code>http://</code></td></tr>
+              <tr><td><code>ad.mobile.final</code></td><td>移动端目标URL</td><td><code>https://</code>或<code>http://</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="subsection" id="step4">
+        <h3 class="subsection-title">STEP 4. 注册关键词 — POST /ncc/keywords</h3>
+        <p><code>nccAdgroupId</code>通过<strong>URL查询参数</strong>传递，而非放在请求体中。请求体为关键词对象的数组。</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/keywords?nccAdgroupId=grp-xyz456" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "keyword": "耐克运动鞋",
+      "bidAmt": 500,
+      "useGroupBidAmt": false
+    },
+    {
+      "keyword": "耐克Air Force折扣",
+      "bidAmt": 300,
+      "useGroupBidAmt": false
+    }
+  ]'</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>参数</th><th>位置</th><th>说明</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccAdgroupId</code></td><td>查询参数</td><td>要注册关键词的广告组ID</td><td>从STEP 2获取</td></tr>
+              <tr><td><code>keyword</code></td><td>Body</td><td>要注册的关键词</td><td>必填，可包含空格</td></tr>
+              <tr><td><code>bidAmt</code></td><td>Body</td><td>各关键词独立出价（70~100,000）</td><td><code>useGroupBidAmt: false</code>时生效</td></tr>
+              <tr><td><code>useGroupBidAmt</code></td><td>Body</td><td>是否使用广告组基础出价</td><td><code>true</code>时沿用广告组出价</td></tr>
+              <tr><td><code>links</code></td><td>Body</td><td>各关键词独立着陆URL</td><td>可选</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">💡 各关键词独立着陆URL设置</h3>
+          <p>Powerlink可为每个关键词指定不同的着陆页。注册关键词时，在可选字段<code>links</code>中分别设置PC/移动端URL即可。未设置时，默认使用广告素材（Ad）中设置的URL。</p>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">bash / curl</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/keywords?nccAdgroupId=grp-xyz456" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "keyword": "耐克运动鞋特卖",
+      "bidAmt": 500,
+      "useGroupBidAmt": false,
+      "links": {
+        "pc": { "final": "https://www.brandstore.com/shoes/sale" },
+        "mobile": { "final": "https://m.brandstore.com/shoes/sale" }
+      }
+    }
+  ]'</code></pre>
+          </div>
+          <div class="info-box" style="margin-top:12px;">
+            💡 <code>links</code>的结构与STEP 3广告素材注册中<code>ad.pc.final</code> / <code>ad.mobile.final</code>的格式相同。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 5 -->
+    <section class="section" id="ch5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        运营API — 查询·修改·统计
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">状态查询与管理</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>操作</th><th>方法</th><th>端点</th></tr></thead>
+            <tbody>
+              <tr><td>查询所有广告系列</td><td><code>GET</code></td><td><code>/ncc/campaigns</code></td></tr>
+              <tr><td>查询特定广告系列</td><td><code>GET</code></td><td><code>/ncc/campaigns/{id}</code></td></tr>
+              <tr><td>修改广告系列</td><td><code>PUT</code></td><td><code>/ncc/campaigns/{id}</code></td></tr>
+              <tr><td>查询广告组</td><td><code>GET</code></td><td><code>/ncc/adgroups</code></td></tr>
+              <tr><td>查询关键词</td><td><code>GET</code></td><td><code>/ncc/keywords</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:14px;">广告系列暂停示例：</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X PUT "https://api.searchad.naver.com/ncc/campaigns/{campaignId}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{"userLock": true}'</code></pre>
+        </div>
+      </div>
+
+      <!-- 统计查询 -->
+      <div class="subsection" id="stats">
+        <h3 class="subsection-title">统计查询 — GET /stats</h3>
+        <p>通过API获取广告效果数据的核心功能。</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/stats?id={资源ID}&fields=[\"clkCnt\",\"impCnt\",\"salesAmt\"]&timeRange={\"since\":\"2026-04-01\",\"until\":\"2026-04-10\"}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>指标字段名</th><th>含义</th></tr></thead>
+            <tbody>
+              <tr><td><code>impCnt</code></td><td>展示次数</td></tr>
+              <tr><td><code>clkCnt</code></td><td>点击次数</td></tr>
+              <tr><td><code>salesAmt</code></td><td>广告费用</td></tr>
+              <tr><td><code>ctr</code></td><td>点击率（CTR）</td></tr>
+              <tr><td><code>cpc</code></td><td>单次点击费用（CPC）</td></tr>
+              <tr><td><code>ccnt</code></td><td>转化次数</td></tr>
+              <tr><td><code>convAmt</code></td><td>转化销售额</td></tr>
+              <tr><td><code>ror</code></td><td>广告回报率（ROAS）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 大量统计 -->
+      <div class="subsection">
+        <h3 class="subsection-title">大量统计 — /stat-reports（报告方式）</h3>
+        <p>查询周期较长或数据量较大时，使用异步报告方式：</p>
+        <div class="step-flow" style="flex-wrap:wrap;gap:8px;">
+          <div class="step-flow-item">
+            <span class="step-num">步骤1</span>
+            POST /stat-reports<br /><small>创建报告请求<br />→ 获取reportId</small>
+          </div>
+          <div class="step-flow-arrow">→</div>
+          <div class="step-flow-item">
+            <span class="step-num">步骤2</span>
+            GET /stat-reports/{id}<br /><small>检查状态<br />WAITING→RUNNING→DONE</small>
+          </div>
+          <div class="step-flow-arrow">→</div>
+          <div class="step-flow-item">
+            <span class="step-num">步骤3</span>
+            DONE状态<br /><small>下载CSV文件</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 关键词查询量 -->
+      <div class="subsection" id="keywordstool">
+        <h3 class="subsection-title">关键词搜索量确认 — GET /keywordstool</h3>
+        <p>广告设置前通过API查询关键词搜索量的功能：</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/keywordstool?hintKeywords=nikeShoes&showDetail=1" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">响应数据：</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>{
+  "keywordList": [
+    {
+      "relKeyword": "耐克运动鞋",
+      "monthlyPcQcCnt": 12000,
+      "monthlyMobileQcCnt": 45000,
+      "compIdx": "high"
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>字段</th><th>含义</th></tr></thead>
+            <tbody>
+              <tr><td><code>monthlyPcQcCnt</code></td><td>每月PC搜索量</td></tr>
+              <tr><td><code>monthlyMobileQcCnt</code></td><td>每月移动端搜索量</td></tr>
+              <tr><td><code>compIdx</code></td><td>竞争程度（LOW / MEDIUM / HIGH）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 出价估算 -->
+      <div class="subsection" id="bid">
+        <h3 class="subsection-title">出价估算 — GET /estimate/bid/keyword</h3>
+        <p>关键词出价设置前，预先确认预估排名和费用：</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/estimate/bid/keyword?keywords=nikeShoes&bids=500,1000,2000" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 6 -->
+    <section class="section" id="ch6">
+      <h2 class="section-title">
+        <span class="section-num">6</span>
+        广告附加信息API — POST /ncc/ad-extensions
+      </h2>
+
+      <div class="code-block-wrap">
+        <div class="code-block-header">
+          <span class="lang-label">bash / curl</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/ad-extensions" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ownerId": "{nccAdId 或 nccAdgroupId}",
+    "type": "SUB_LINKS",
+    "pcChannelId": "{nccBusinessChannelId}",
+    "mobileChannelId": "{nccBusinessChannelId}",
+    "userLock": false,
+    "schedule": {}
+  }'</code></pre>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px;">
+        <table>
+          <thead><tr><th>参数</th><th>说明</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td><code>ownerId</code></td><td>要关联广告附加信息的广告实体ID</td><td>广告系列、广告组、素材ID均可（必填）</td></tr>
+            <tr><td><code>type</code></td><td>广告附加信息类型代码</td><td>必填</td></tr>
+            <tr><td><code>pcChannelId</code></td><td>PC Business Channel ID</td><td>必填</td></tr>
+            <tr><td><code>mobileChannelId</code></td><td>移动端Business Channel ID</td><td>必填</td></tr>
+            <tr><td><code>userLock</code></td><td>展示开/关（<code>true</code>=暂停）</td><td>必填</td></tr>
+            <tr><td><code>schedule</code></td><td>按星期和时间段的展示计划</td><td>必填</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warning-box" style="margin-top:14px;">
+        ⚠️ 广告附加信息内容（子链接URL等）的详细格式，请参考GitBook FAQ：<a href="https://github.com/naver/searchad-apidoc/wiki/FAQ" target="_blank">github.com/naver/searchad-apidoc/wiki/FAQ</a>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px;">
+        <table>
+          <thead><tr><th>类型</th><th>API type值</th></tr></thead>
+          <tbody>
+            <tr><td>子链接</td><td><code>SUB_LINKS</code></td></tr>
+            <tr><td>宣传文案</td><td><code>DESCRIPTION</code></td></tr>
+            <tr><td>附加标题</td><td><code>HEADLINE</code></td></tr>
+            <tr><td>电话号码</td><td><code>PHONE</code></td></tr>
+            <tr><td>位置信息</td><td><code>LOCATION</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 7 -->
+    <section class="section" id="ch7">
+      <h2 class="section-title">
+        <span class="section-num">7</span>
+        API运营技巧
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">共享预算运用 — /ncc/shared-budgets</h3>
+        <p>将多个广告系列的预算集中管理为一个共享预算：</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">结构图</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>POST /ncc/shared-budgets  → 创建共享预算
+PUT  /ncc/campaigns/{id}  → 关联sharedBudgetId</code></pre>
+        </div>
+        <p>多个广告系列共享一个预算池 → 高效消耗预算，集中管理</p>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">API调用注意事项</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>项目</th><th>内容</th></tr></thead>
+            <tbody>
+              <tr><td>Timestamp有效时间</td><td>以服务器时间为准<strong>±300秒（5分钟）以内</strong></td></tr>
+              <tr><td>请求限制（Rate Limit）</td><td>每秒请求数量有限制——过多调用返回<code>429</code>错误</td></tr>
+              <tr><td>数组注册限制</td><td>关键词等数组型POST时，每次最多建议<strong>100个</strong></td></tr>
+              <tr><td>Customer ID</td><td>X-Customer请求头为数字型广告账户ID</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">主要错误代码</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>HTTP代码</th><th>含义</th><th>解决方法</th></tr></thead>
+            <tbody>
+              <tr><td><code style="color:#e74c3c;">400</code></td><td>错误的请求（参数错误）</td><td>检查请求Body/参数</td></tr>
+              <tr><td><code style="color:#e74c3c;">401</code></td><td>认证失败</td><td>重新确认Signature生成逻辑</td></tr>
+              <tr><td><code style="color:#e74c3c;">403</code></td><td>无权限</td><td>确认Customer ID</td></tr>
+              <tr><td><code style="color:#e74c3c;">404</code></td><td>资源不存在</td><td>确认ID值</td></tr>
+              <tr><td><code style="color:#e74c3c;">429</code></td><td>超出调用限制</td><td>降低请求频率</td></tr>
+              <tr><td><code style="color:#e74c3c;">500</code></td><td>服务器错误</td><td>稍后重试</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Java / PHP / C# 示例代码</strong><br />
+        其他语言的示例请参考GitBook官方文档（<a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>）。
+      </div>
+    </section>
+
+    <!-- Back -->
+    <div style="margin-top:40px;text-align:center;">
+      <a href="powerlink-understanding-zh.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text-sub);transition:.15s;">
+        ← 返回Powerlink概念介绍
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API官方文档：<a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    广告系统：<a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

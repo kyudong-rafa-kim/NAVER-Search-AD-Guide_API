@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Search Ads API Setup &amp; Operations — Naver Search Ads API Guide</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index-en.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">Naver Search Ads API Guide</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link">Powerlink <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding-en.html">Overview</a>
+        <a href="powerlink-api-en.html">API Setup &amp; Operations</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link active">Shopping Search Ads <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding-en.html">Overview</a>
+        <a href="shopping-api-en.html">API Setup &amp; Operations</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-api.html">한국어</a>
+        <a href="shopping-api-en.html" class="lang-active">English</a>
+        <a href="shopping-api-zh.html">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">Shopping Search Ads · API</div>
+  <h1>API Setup &amp; Operations</h1>
+  <p>Step-by-step guidance with curl examples: from Business Channel query to campaign creation, ad group &amp; creative registration, and statistics retrieval.</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>Contents</h3>
+    <ul>
+      <li><a href="#ch1">CH 1. Differences from Powerlink API</a></li>
+      <li><a href="#ch2">CH 2. Prerequisites</a></li>
+      <li class="sub"><a href="#ch2-1">Business Channel Query</a></li>
+      <li class="sub"><a href="#ch2-2">Product Group Query</a></li>
+      <li><a href="#ch3">CH 3. Core Workflow</a></li>
+      <li class="sub"><a href="#step1">STEP 1. Create Campaign</a></li>
+      <li class="sub"><a href="#step2">STEP 2. Create Ad Group</a></li>
+      <li class="sub"><a href="#step3">STEP 3. Register Creative (Product)</a></li>
+      <li><a href="#ch4">CH 4. Creative Query &amp; Modification</a></li>
+      <li><a href="#ch5">CH 5. Operations API</a></li>
+      <li class="sub"><a href="#stats">Statistics Query</a></li>
+      <li class="sub"><a href="#stat-reports">Bulk Statistics</a></li>
+      <li><a href="#ch6">CH 6. Operations Tips</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- CH 1 -->
+    <section class="section" id="ch1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        Differences from Powerlink API
+      </h2>
+
+      <div class="info-box">
+        💡 Authentication method, Base URL, and header structure are identical to Powerlink API. Shopping-specific settings begin at the campaign setup stage.
+      </div>
+
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead><tr><th>Item</th><th>Powerlink</th><th>Shopping Search Ads</th></tr></thead>
+          <tbody>
+            <tr><td>Base URL</td><td><code>https://api.searchad.naver.com</code></td><td>Same</td></tr>
+            <tr><td>Authentication</td><td>HMAC-SHA256</td><td>Same</td></tr>
+            <tr><td><code>campaignTp</code></td><td><code>WEB_SITE</code></td><td><code>SHOPPING</code></td></tr>
+            <tr><td>Ad type</td><td><code>TEXT_45</code></td><td><code>SHOPPING_PRODUCT_AD</code></td></tr>
+            <tr><td>Keyword registration</td><td>Manual (POST /ncc/keywords)</td><td>System auto-matching — no separate registration needed</td></tr>
+            <tr><td>Creative basis</td><td>Headline + description text entered directly</td><td>EP product data linked through CPS enrollment</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box" style="margin-top:16px;">
+        💡 <strong>What is EP?</strong> EP (product feed) is linked during Naver Shopping CPS enrollment and contains product name, price, category, attributes, images, etc. Shopping Search Ads use the EP product data already linked during the enrollment process as ad creative. You do not need to connect a separate EP.
+      </div>
+      <div class="warning-box" style="margin-top:12px;">
+        ⚠️ <strong>Want to run a dedicated EP for Shopping Search Ads?</strong><br />
+        If you want to run Shopping Search Ads independently from the price comparison service, you can create a dedicated EP for Shopping Search Ads and use it separately.
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 2 -->
+    <section class="section" id="ch2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        Prerequisites — Business Channel &amp; Product Group Query
+      </h2>
+
+      <p>Before setting up campaigns, you must first query the shopping channels and product groups linked to your ad account via API.</p>
+
+      <!-- 2-1 -->
+      <div class="subsection" id="ch2-1">
+        <h3 class="subsection-title">2-1. Business Channel Query — GET /ncc/channels</h3>
+        <p>Query the shopping channels linked to your ad account (CPS enrollment completed).</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/channels" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">Response example:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>[
+  {
+    "nccBusinessChannelId": "ch-001",
+    "channelTp": "SITE",
+    "name": "My Shopping Mall",
+    "pcInspectStatus": "APPROVED"
+  }
+]</code></pre>
+        </div>
+
+        <div class="warning-box" style="margin-top:12px;">
+          ⚠️ Only channels where <code>pcInspectStatus</code> is <code>APPROVED</code> can be used for ads.<br />
+          Note the <code>nccBusinessChannelId</code> from the response — it is used as the <code>pcChannelId</code> / <code>mobileChannelId</code> value when creating an ad group.
+        </div>
+      </div>
+
+      <!-- 2-2 -->
+      <div class="subsection" id="ch2-2">
+        <h3 class="subsection-title">2-2. Product Group Query — GET /ncc/product-groups</h3>
+        <p>EP products linked during CPS enrollment are managed in <strong>Product Group</strong> units. Before creating ad groups, query the product group list to find the <code>nccProductGroupId</code>.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/product-groups" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">Response example:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>[
+  {
+    "nccProductGroupId": "pg-001",
+    "nccBusinessChannelId": "ch-001",
+    "mallId": "my-mall-001",
+    "mallName": "My Shopping Mall",
+    "name": "All Products Group",
+    "brandName": "My Brand",
+    "registeredProductType": "GENERAL",
+    "registrationMethod": "WHOLE",
+    "numberOfAdgroups": 0
+  }
+]</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>Field</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccProductGroupId</code></td><td>Product group unique ID — used when creating ad groups</td></tr>
+              <tr><td><code>nccBusinessChannelId</code></td><td>Linked Business Channel ID</td></tr>
+              <tr><td><code>mallId</code> / <code>mallName</code></td><td>Shopping mall identification</td></tr>
+              <tr><td><code>name</code></td><td>Product group name</td></tr>
+              <tr><td><code>registeredProductType</code></td><td><code>GENERAL</code> (standard) / <code>CATALOG</code> / <code>BLOG</code></td></tr>
+              <tr><td><code>registrationMethod</code></td><td><code>WHOLE</code> (all products) / <code>EACH</code> (selected products)</td></tr>
+              <tr><td><code>numberOfAdgroups</code></td><td>Number of ad groups currently using this product group</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box" style="margin-top:12px;">
+          💡 <code>nccProductGroupId</code> is used to specify the product group when creating an ad group.
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 3 -->
+    <section class="section" id="ch3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        Core API Workflow — Step-by-Step Setup
+      </h2>
+
+      <p>Recommended order for Shopping Search Ads API setup:</p>
+      <div class="step-flow">
+        <div class="step-flow-item">
+          <span class="step-num">Pre-check</span>
+          Channel ID + Product Group ID
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 1</span>
+          Create Campaign
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 2</span>
+          Create Ad Group
+        </div>
+        <div class="step-flow-arrow">→</div>
+        <div class="step-flow-item">
+          <span class="step-num">STEP 3</span>
+          Register Creative (Product)
+        </div>
+      </div>
+
+      <div class="info-box">
+        💡 No keyword registration step — EP-based system handles automatic matching
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="subsection" id="step1">
+        <h3 class="subsection-title">STEP 1. Create Campaign — POST /ncc/campaigns</h3>
+        <p>Uses the same endpoint as Powerlink. Only the <code>campaignTp</code> value differs — set to <code>SHOPPING</code>.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/campaigns" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "campaignTp": "SHOPPING",
+    "name": "ShoppingAds_Campaign",
+    "dailyBudget": 100000,
+    "useDailyBudget": true
+  }'</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>Parameter</th><th>Description</th><th>Shopping value</th></tr></thead>
+            <tbody>
+              <tr><td><code>campaignTp</code></td><td>Campaign type</td><td><code>"SHOPPING"</code> (Powerlink uses <code>"WEB_SITE"</code>)</td></tr>
+              <tr><td><code>name</code></td><td>Campaign name</td><td>Free input</td></tr>
+              <tr><td><code>dailyBudget</code></td><td>Daily budget (KRW)</td><td>e.g., <code>100000</code></td></tr>
+              <tr><td><code>useDailyBudget</code></td><td>Whether to apply daily budget</td><td><code>true</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:12px;">What to check in the response:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>{
+  "nccCampaignId": "cmp-shop-001"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="subsection" id="step2">
+        <h3 class="subsection-title">STEP 2. Create Ad Group — POST /ncc/adgroups</h3>
+        <p><strong>The grouping strategy varies based on SKU volume.</strong></p>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Case 1 — Category-based grouping (large SKU)</h3>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">bash / curl</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/adgroups" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccCampaignId": "cmp-shop-001",
+    "pcChannelId": "{nccBusinessChannelId}",
+    "mobileChannelId": "{nccBusinessChannelId}",
+    "nccProductGroupId": "pg-001",
+    "name": "Category1_Group",
+    "bidAmt": 200
+  }'</code></pre>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Case 2 — Core keyword-based grouping (small SKU)</h3>
+          <div class="code-block-wrap">
+            <div class="code-block-header">
+              <span class="lang-label">bash / curl</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/adgroups" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccCampaignId": "cmp-shop-001",
+    "pcChannelId": "{nccBusinessChannelId}",
+    "mobileChannelId": "{nccBusinessChannelId}",
+    "nccProductGroupId": "pg-001",
+    "name": "CoreKeyword1_Group",
+    "bidAmt": 200
+  }'</code></pre>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>Parameter</th><th>Description</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccCampaignId</code></td><td>Campaign ID from STEP 1</td><td>Required</td></tr>
+              <tr><td><code>pcChannelId</code></td><td>PC Business Channel ID</td><td>Required — <code>nccBusinessChannelId</code> from CH 2-1 response</td></tr>
+              <tr><td><code>mobileChannelId</code></td><td>Mobile Business Channel ID</td><td>Required — same value can be used</td></tr>
+              <tr><td><code>nccProductGroupId</code></td><td>Product group ID</td><td><code>nccProductGroupId</code> from CH 2-2 response</td></tr>
+              <tr><td><code>name</code></td><td>Ad group name</td><td>Name according to your grouping strategy</td></tr>
+              <tr><td><code>bidAmt</code></td><td>Base bid (KRW, 70–100,000)</td><td>Individual creative bids can also be set</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:12px;">What to check in the response:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">json</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-json"><code>{
+  "nccAdgroupId": "grp-shop-001"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="subsection" id="step3">
+        <h3 class="subsection-title">STEP 3. Register Creative (Product) — POST /ncc/ads</h3>
+        <p>Shopping Search Ad creatives are based on EP products linked during CPS enrollment. Specify <code>type</code> as <code>SHOPPING_PRODUCT_AD</code>. Set a per-creative bid via <code>adAttr.bidAmt</code>; to use the group's base bid, set <code>useGroupBidAmt: true</code>.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X POST "https://api.searchad.naver.com/ncc/ads" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nccAdgroupId": "grp-shop-001",
+    "type": "SHOPPING_PRODUCT_AD",
+    "adAttr": {
+      "bidAmt": 200,
+      "useGroupBidAmt": false
+    }
+  }'</code></pre>
+        </div>
+
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>Parameter</th><th>Description</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td><code>nccAdgroupId</code></td><td>Ad group ID</td><td>Obtained from STEP 2</td></tr>
+              <tr><td><code>type</code></td><td>Creative type</td><td><code>"SHOPPING_PRODUCT_AD"</code> fixed (see GitBook, <code>GET /ncc/product-groups</code>)</td></tr>
+              <tr><td><code>adAttr.bidAmt</code></td><td>Per-creative individual bid</td><td>Used when setting an individual creative bid</td></tr>
+              <tr><td><code>adAttr.useGroupBidAmt</code></td><td>Whether to use the group's base bid</td><td><code>true</code> follows the group bid (see GitBook)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box" style="margin-top:12px;">
+          💡 Keywords are not registered separately. The system automatically matches relevant keywords based on the EP product's name, attributes, and category information.
+        </div>
+
+        <div class="warning-box" style="margin-top:12px;">
+          ⚠️ Detailed custom fields for creative details (such as additional promotional copy) are not separately documented for the <code>SHOPPING_PRODUCT_AD</code> type <code>ad</code> object schema in the GitBook Reference. For detailed implementation, refer to the official Naver Search Ads API guide.
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 4 -->
+    <section class="section" id="ch4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        Creative Query &amp; Modification
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">List All Creatives — GET /ncc/ads</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/ncc/ads?nccAdgroupId=grp-shop-001" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Modify Creative Bid — PUT /ncc/ads/{nccAdId}</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X PUT "https://api.searchad.naver.com/ncc/ads/{nccAdId}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "adAttr": {
+      "bidAmt": 300,
+      "useGroupBidAmt": false
+    }
+  }'</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 5 -->
+    <section class="section" id="ch5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        Operations API — Query · Modify · Statistics
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Campaign/Group Status Management</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Action</th><th>Method</th><th>Endpoint</th></tr></thead>
+            <tbody>
+              <tr><td>List all campaigns</td><td>GET</td><td><code>/ncc/campaigns</code></td></tr>
+              <tr><td>Pause campaign</td><td>PUT</td><td><code>/ncc/campaigns/{id}</code></td></tr>
+              <tr><td>List ad groups</td><td>GET</td><td><code>/ncc/adgroups</code></td></tr>
+              <tr><td>Modify ad group bid</td><td>PUT</td><td><code>/ncc/adgroups/{id}</code></td></tr>
+              <tr><td>List creatives</td><td>GET</td><td><code>/ncc/ads</code></td></tr>
+              <tr><td>Modify creative</td><td>PUT</td><td><code>/ncc/ads/{id}</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:16px;">Campaign pause example:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X PUT "https://api.searchad.naver.com/ncc/campaigns/{campaignId}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{"userLock": true}'</code></pre>
+        </div>
+
+        <p style="margin-top:16px;">Ad group bid modification example:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X PUT "https://api.searchad.naver.com/ncc/adgroups/{adgroupId}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}" \
+  -H "Content-Type: application/json" \
+  -d '{"bidAmt": 300}'</code></pre>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="subsection" id="stats">
+        <h3 class="subsection-title">Statistics Query — GET /stats</h3>
+        <p>Uses the same endpoint as Powerlink.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code>curl -X GET "https://api.searchad.naver.com/stats?id={campaignId or groupId or adId}&fields=[\"clkCnt\",\"impCnt\",\"salesAmt\",\"convCnt\"]&timeRange={\"since\":\"2026-04-01\",\"until\":\"2026-04-10\"}" \
+  -H "X-Timestamp: {timestamp}" \
+  -H "X-API-KEY: {API KEY}" \
+  -H "X-Customer: {Customer ID}" \
+  -H "X-Signature: {signature}"</code></pre>
+        </div>
+
+        <p style="margin-top:14px;">Key metrics for Shopping Search Ads:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Metric field</th><th>Meaning</th><th>Why it matters for Shopping</th></tr></thead>
+            <tbody>
+              <tr><td><code>impCnt</code></td><td>Impressions</td><td>Check auto-matching coverage</td></tr>
+              <tr><td><code>clkCnt</code></td><td>Clicks</td><td>Assess creative CTR</td></tr>
+              <tr><td><code>salesAmt</code></td><td>Ad spend</td><td>Confirm budget consumption</td></tr>
+              <tr><td><code>ctr</code></td><td>Click-through rate</td><td>Gauge creative attractiveness</td></tr>
+              <tr><td><code>convCnt</code></td><td>Conversions</td><td>Check connection to actual purchases</td></tr>
+              <tr><td><code>convAmt</code></td><td>Conversion revenue</td><td>Basis for ROAS calculation</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bulk stats -->
+      <div class="subsection" id="stat-reports">
+        <h3 class="subsection-title">Bulk Statistics — /stat-reports</h3>
+        <p>Use the asynchronous report method for long date ranges or large data volumes:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">Flow</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>Step 1. POST /stat-reports  → Create report request → Obtain reportId
+Step 2. GET  /stat-reports/{reportId}  → Check status (WAITING → RUNNING → DONE)
+Step 3. DONE status → Download CSV file from the report download URL</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 6 -->
+    <section class="section" id="ch6">
+      <h2 class="section-title">
+        <span class="section-num">6</span>
+        Operations Tips — Shopping Search Ads Specific
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Creative Quality Determines Exposure Range</h3>
+        <p>Since Shopping Search Ads don't require manual keyword registration, the quality of product information determines the exposure range:</p>
+        <ul class="bullet-list">
+          <li>Include rich core keywords in the product name → automatically matched to more keywords</li>
+          <li>Set the category accurately → improves accuracy of relevant query matching</li>
+          <li>Always fill in the additional promotional text → fastest way to improve CTR</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Manage Bids Separately by Group</h3>
+        <p>For large SKU catalogs, set different bids per group to run budgets efficiently:</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code># High-margin category group → higher bid
+curl -X PUT "https://api.searchad.naver.com/ncc/adgroups/{highMarginGroupId}" \
+  -d '{"bidAmt": 500}'
+
+# Regular category group → lower bid
+curl -X PUT "https://api.searchad.naver.com/ncc/adgroups/{regularGroupId}" \
+  -d '{"bidAmt": 150}'</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">API Call Precautions</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Details</th></tr></thead>
+            <tbody>
+              <tr><td>Timestamp validity</td><td>Within <strong>±300 seconds (5 minutes)</strong> of server time</td></tr>
+              <tr><td>Rate limit</td><td>Per-second request limit applies — excessive calls return <code>429</code> error</td></tr>
+              <tr><td>Array batch limit</td><td>Up to <strong>100 items</strong> per request recommended for array POST</td></tr>
+              <tr><td>productId verification</td><td>Confirm the exact product ID from Shopping Partner Center before use</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Common Error Codes</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>HTTP Code</th><th>Meaning</th><th>Resolution</th></tr></thead>
+            <tbody>
+              <tr><td><code style="color:#e74c3c;">400</code></td><td>Bad request (parameter error)</td><td>Check campaignTp, productId, and other parameters</td></tr>
+              <tr><td><code style="color:#e74c3c;">401</code></td><td>Authentication failure</td><td>Re-verify signature generation logic</td></tr>
+              <tr><td><code style="color:#e74c3c;">403</code></td><td>Permission denied</td><td>Check channel integration status (APPROVED)</td></tr>
+              <tr><td><code style="color:#e74c3c;">404</code></td><td>Resource not found</td><td>Check ID values</td></tr>
+              <tr><td><code style="color:#e74c3c;">429</code></td><td>Rate limit exceeded</td><td>Reduce request frequency</td></tr>
+              <tr><td><code style="color:#e74c3c;">500</code></td><td>Server error</td><td>Retry after a moment</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Java / PHP / C# Sample Code</strong><br />
+        For samples in other languages, refer to the official GitBook (<a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>).
+      </div>
+    </section>
+
+    <!-- Back -->
+    <div style="margin-top:40px;text-align:center;">
+      <a href="shopping-understanding-en.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;color:var(--text-sub);transition:.15s;">
+        ← Back to Understanding Shopping Search Ads
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API Docs: <a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    Ad System: <a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

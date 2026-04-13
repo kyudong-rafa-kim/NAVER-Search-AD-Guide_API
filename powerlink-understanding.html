@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>파워링크 이해하기 — 네이버 검색광고 API 가이드</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="logo-mark">N</span>
+    <span class="logo-text">네이버 검색광고 API로 시작하기</span>
+  </a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link active">파워링크 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding.html">이해하기</a>
+        <a href="powerlink-api.html">API로 세팅 및 운영하기</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link">쇼핑검색광고 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="shopping-understanding.html">이해하기</a>
+        <a href="shopping-api.html">API로 세팅 및 운영하기</a>
+      </div>
+    </li>
+    <li class="nav-item lang-switcher">
+      <span class="nav-link">🌐 <span class="arrow">▾</span></span>
+      <div class="dropdown">
+        <a href="powerlink-understanding.html" class="lang-active">한국어</a>
+        <a href="powerlink-understanding-en.html">English</a>
+        <a href="powerlink-understanding-zh.html">中文</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-toggle"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+  <div class="badge">파워링크</div>
+  <h1>파워링크 이해하기</h1>
+  <p>네이버 검색광고의 기본 개념, 캠페인 구조, 소재 전략, 키워드 유형, ADVoost AI 확장검색, 최적화 지표까지 한눈에 정리합니다.</p>
+</header>
+
+<!-- Content Wrapper -->
+<div class="content-wrap">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h3>목차</h3>
+    <ul>
+      <li><a href="#section1">SECTION 1. 파워링크란?</a></li>
+      <li><a href="#section2">SECTION 2. 캠페인 구조</a></li>
+      <li><a href="#section3">SECTION 3. 소재 (Ad Creative)</a></li>
+      <li class="sub"><a href="#section3-rsa">반응형 소재 (RSA)</a></li>
+      <li class="sub"><a href="#section3-ext">확장소재 13가지</a></li>
+      <li><a href="#section4">SECTION 4. 키워드</a></li>
+      <li><a href="#section5">SECTION 5. ADVoost 확장검색</a></li>
+      <li><a href="#section6">SECTION 6. 광고 최적화 지표</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- SECTION 1 -->
+    <section class="section" id="section1">
+      <h2 class="section-title">
+        <span class="section-num">1</span>
+        파워링크란?
+      </h2>
+
+      <div class="highlight-box">
+        <strong>핵심 메시지:</strong> 파워링크는 네이버 검색 결과 최상단에 노출되는 키워드 기반 <strong>CPC 광고</strong>입니다.
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>항목</th><th>내용</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>공식 명칭</td><td>사이트검색광고 (통칭: 파워링크, 키워드검색광고)</td></tr>
+            <tr><td>노출 위치</td><td>네이버 통합검색 결과 최상단 (PC + Mobile)</td></tr>
+            <tr><td>과금 방식</td><td>CPC (Cost Per Click) — 클릭이 발생할 때만 과금</td></tr>
+            <tr><td>국내 점유율</td><td>검색광고 시장 <strong>65%</strong></td></tr>
+            <tr><td>전국 커버리지</td><td>국내 인터넷 사용자 <strong>71%</strong> 도달</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">파워링크의 핵심 장점</h3>
+        <ul class="bullet-list">
+          <li>구매 의도가 명확한 사용자가 직접 검색한 순간에 광고 노출</li>
+          <li>노출 자체는 무료, 클릭에만 비용 발생 → 예산 효율적</li>
+          <li>네이버 PC + 모바일 통합 운영, 별도 설정 없이 양쪽 동시 노출</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 2 -->
+    <section class="section" id="section2">
+      <h2 class="section-title">
+        <span class="section-num">2</span>
+        캠페인 구조
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">계정 구조 4단계</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">구조도</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>계정 (Account)
+  └── 캠페인 (Campaign)         ← 광고 목표 단위
+        └── 광고그룹 (Ad Group)  ← 전략 단위 (타겟팅/입찰/예산)
+              ├── 소재 (Ad Creative)
+              ├── 키워드 (Keywords)
+              └── 연결 URL (Landing URL)</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">캠페인 (Campaign)</h3>
+        <ul class="bullet-list">
+          <li><strong>역할:</strong> 광고의 최상위 목표 단위</li>
+          <li><strong>권장:</strong> 하나의 비즈니스 목표 = 하나의 캠페인</li>
+          <li><strong>설정 항목:</strong> 캠페인 이름, 하루 예산 한도, 기간 설정</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">광고그룹 (Ad Group)</h3>
+        <ul class="bullet-list">
+          <li><strong>역할:</strong> 전략 단위 — 동일한 타겟/입찰 전략을 공유하는 키워드+소재 묶음</li>
+          <li><strong>설정 항목:</strong> 기기 타겟팅(PC/모바일), 지역 타겟팅, 요일/시간 타겟팅, 기본 입찰가</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 3 -->
+    <section class="section" id="section3">
+      <h2 class="section-title">
+        <span class="section-num">3</span>
+        소재 (Ad Creative)
+      </h2>
+
+      <div class="subsection">
+        <h3 class="subsection-title">소재의 3가지 구성요소</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>구성요소</th><th>설명</th><th>글자 수 제한</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>① 제목 (Headline)</td><td>광고의 핵심 메시지, 클릭을 유도하는 첫인상</td><td><strong>15자 이내</strong></td></tr>
+              <tr><td>② 설명 (Description)</td><td>제품/서비스 상세 설명, 행동 유도 문구</td><td><strong>45자 이내</strong></td></tr>
+              <tr><td>③ 확장소재</td><td>추가 정보 노출로 광고 크기와 CTR 증대</td><td>유형별 상이</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RSA -->
+      <div class="subsection" id="section3-rsa">
+        <h3 class="subsection-title">반응형 소재 (RSA: Responsive Search Ad)</h3>
+        <div class="highlight-box">
+          <strong>핵심 개념:</strong> 여러 제목과 설명을 등록하면 <strong>네이버 AI가 최적 조합을 자동 선택</strong>하여 노출합니다.
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>구분</th><th>기본 소재</th><th>반응형 소재 (RSA)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>제목 등록 수</td><td>1개</td><td>최대 <strong>15개</strong></td></tr>
+              <tr><td>설명 등록 수</td><td>1개</td><td>최대 <strong>4개</strong></td></tr>
+              <tr><td>조합 방식</td><td>고정</td><td>AI 자동 조합</td></tr>
+              <tr><td>CTR 개선</td><td>기준</td><td><strong>+12% 향상</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">RSA 활용 팁</h3>
+          <ul class="bullet-list">
+            <li>제목 15개를 다른 메시지 각도로 작성 (가격 강조형, 혜택 강조형, 긴급성 강조형 등)</li>
+            <li>AI가 검색어·사용자 맥락에 맞는 최적 조합을 실시간 선택</li>
+            <li>성과 데이터 누적 후 저성과 제목 교체로 지속 최적화 가능</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5가지 원칙 -->
+      <div class="subsection">
+        <h3 class="subsection-title">효과적인 소재 작성 5가지 원칙</h3>
+        <ol class="steps-list">
+          <li><strong>키워드 포함:</strong> 검색어를 제목에 자연스럽게 포함 → 볼드 처리되어 시선 집중</li>
+          <li><strong>명확한 혜택 제시:</strong> "무료배송", "당일출고", "30% 할인" 등 구체적 수치 사용</li>
+          <li><strong>차별화 포인트 강조:</strong> 경쟁사와 다른 고유한 강점 명시</li>
+          <li><strong>행동 유도 문구(CTA):</strong> "지금 확인", "무료 상담", "바로 구매" 등 명확한 액션 유도</li>
+          <li><strong>랜딩페이지와 일치:</strong> 광고에서 약속한 내용이 랜딩페이지에 실제로 있어야 함</li>
+        </ol>
+      </div>
+
+      <!-- 확장소재 -->
+      <div class="subsection" id="section3-ext">
+        <h3 class="subsection-title">확장소재 (Ad Extensions) — 13가지 유형</h3>
+        <p>기본 소재(제목+설명) 외에 추가 정보를 노출해 광고 크기를 키우고 CTR을 높이는 기능입니다.</p>
+
+        <div class="subsection">
+          <h3 class="subsection-title">4가지 필수 확장소재 (최상단 노출 기준)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>순위</th><th>유형</th><th>설명</th><th>효과</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td><strong>서브링크</strong></td><td>사이트 내 주요 페이지로 바로 이동하는 링크 4개</td><td>광고 크기 2배, 이탈률 감소</td></tr>
+                <tr><td>2</td><td><strong>홍보문구</strong></td><td>브랜드/제품의 핵심 메시지 1줄 추가</td><td>메시지 강화</td></tr>
+                <tr><td>3</td><td><strong>파워링크이미지</strong></td><td>광고에 이미지 노출 (PC 기준 우측 영역)</td><td>시각적 주목도 증대</td></tr>
+                <tr><td>4</td><td><strong>추가제목</strong></td><td>제목 아래 보조 제목 1줄 추가</td><td>정보량 증가</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>이미지+설명형 확장소재 — 최고 성과 유형:</strong><br />
+          CTR 최대 <strong>14배 향상</strong> (이미지 없는 광고 대비)<br />
+          해당 유형: 파워링크이미지, 이미지형 서브링크, 이미지형 홍보문구
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">확장소재 13가지 전체 목록</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>번호</th><th>유형</th><th>주요 용도</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>서브링크</td><td>사이트 내 세부 페이지 직접 연결</td></tr>
+                <tr><td>2</td><td>홍보문구</td><td>핵심 마케팅 메시지 강조</td></tr>
+                <tr><td>3</td><td>파워링크이미지</td><td>대표 제품/브랜드 이미지</td></tr>
+                <tr><td>4</td><td>추가제목</td><td>보조 헤드라인</td></tr>
+                <tr><td>5</td><td>전화번호</td><td>클릭 시 바로 전화 연결</td></tr>
+                <tr><td>6</td><td>위치정보</td><td>매장 주소 및 지도 연동</td></tr>
+                <tr><td>7</td><td>계산기</td><td>보험료·대출 등 계산 기능</td></tr>
+                <tr><td>8</td><td>가격표</td><td>상품별 가격 직접 노출</td></tr>
+                <tr><td>9</td><td>사이트링크</td><td>추가 랜딩페이지 연결</td></tr>
+                <tr><td>10</td><td>이미지형 서브링크</td><td>이미지+링크 조합</td></tr>
+                <tr><td>11</td><td>이미지형 홍보문구</td><td>이미지+문구 조합</td></tr>
+                <tr><td>12</td><td>동영상</td><td>제품 영상 노출</td></tr>
+                <tr><td>13</td><td>플레이스</td><td>네이버 플레이스 연동</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">확장소재 요일/시간 타겟팅</h3>
+          <p>확장소재는 요일별·시간대별로 다르게 노출 설정이 가능합니다.</p>
+          <ul class="bullet-list">
+            <li>평일 오전 → "당일 배송 가능" 홍보문구</li>
+            <li>주말 → "주말 특가 이벤트" 홍보문구</li>
+            <li>영업시간에만 → 전화번호 확장소재 노출</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 4 -->
+    <section class="section" id="section4">
+      <h2 class="section-title">
+        <span class="section-num">4</span>
+        키워드
+      </h2>
+      <p class="text-small" style="margin-bottom:16px;">출처: NAVER_파워링크101_2512_FINAL.pdf 공식 분류 기준</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">키워드 3가지 유형</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>유형</th><th>검색량</th><th>CPC</th><th>전환율(CVR)</th><th>주요 목적</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>숏테일</strong> (Short-tail)</td><td>높음</td><td>높음</td><td>낮음</td><td>브랜드 인지도, 최상단 노출</td></tr>
+              <tr><td><strong>롱테일</strong> (Long-tail)</td><td>낮음</td><td>낮음</td><td>높음</td><td>구매 전환, 예산 효율</td></tr>
+              <tr><td><strong>시즈널</strong> (Seasonal)</td><td>기간 급등</td><td>기간 상승</td><td>시기 의존</td><td>시즌 수요 선점</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">숏테일 키워드</h3>
+        <ul class="bullet-list">
+          <li>예: "운동화", "보험", "여행"</li>
+          <li>검색량이 많아 노출은 크지만, 구매 의도가 불명확한 사용자 포함</li>
+          <li>CPC가 높아 예산 소진 빠름 → 브랜드 인지 목적으로 활용</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">롱테일 키워드</h3>
+        <ul class="bullet-list">
+          <li>예: "나이키 에어포스 흰색 270 남성", "30대 남성 당뇨 보험 추천"</li>
+          <li>검색량은 적지만, 구매 의도가 명확한 사용자</li>
+          <li>CPC가 낮고 전환율이 높아 ROI 효율이 가장 우수</li>
+          <li><strong>초보 광고주에게 우선 추천</strong></li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">시즈널 키워드</h3>
+        <ul class="bullet-list">
+          <li>예: "발렌타인 선물 추천", "수능 이후 여행", "여름 에어컨 추천"</li>
+          <li>특정 시즌·이벤트에 검색량이 급증하는 키워드</li>
+          <li>시즌 <strong>2~4주 전</strong> 미리 등록하여 품질 안정화 후 노출 극대화</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">키워드 발굴 방법</h3>
+        <ul class="bullet-list">
+          <li><strong>네이버 광고 시스템 내 키워드 도구:</strong> 월간 검색수, 경쟁 정도, 추천 입찰가 확인 가능</li>
+          <li><strong>API 활용:</strong> <code>/keywordstool</code> 엔드포인트로 대량 키워드 검색량 데이터 수집 가능</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 5 -->
+    <section class="section" id="section5">
+      <h2 class="section-title">
+        <span class="section-num">5</span>
+        ADVoost 검색 — AI 기반 확장 검색
+      </h2>
+      <p class="text-small" style="margin-bottom:16px;">출처: [네이버] ADVoost검색_플레이북_25년7월.pdf · 2026년 4월 기준: 정식 운영 중</p>
+
+      <div class="subsection">
+        <h3 class="subsection-title">ADVoost 검색이란?</h3>
+
+        <div class="warning-box">
+          <strong>기존 파워링크의 한계:</strong><br />
+          광고주가 직접 등록한 키워드에만 광고 노출 → 검색자가 다른 표현을 쓰면 광고 미노출
+        </div>
+
+        <div class="highlight-box">
+          <strong>ADVoost 검색의 혁신:</strong><br />
+          네이버 AI가 검색어와 랜딩페이지 간의 연관성을 분석하여, 광고주가 등록하지 않은 키워드에도 광고를 자동으로 노출
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">비교</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>[기존 방식]
+검색어: "나이키 에어맥스 할인" → 키워드 등록 필요 → 미등록 시 광고 미노출
+
+[ADVoost 방식]
+검색어: "나이키 에어맥스 할인" → AI가 랜딩페이지 분석
+→ 페이지에 관련 내용 있음 → 자동 노출</code></pre>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">ADVoost가 SEO를 중요하게 만드는 이유</h3>
+        <p>ADVoost는 크롤러가 랜딩페이지를 읽고 페이지의 주제와 검색어의 연관성을 판단합니다.</p>
+        <ul class="bullet-list">
+          <li>랜딩페이지의 SEO가 잘 되어 있을수록 → AI가 더 많은 연관 키워드에서 광고를 노출</li>
+          <li>SEO가 불량한 페이지(텍스트가 이미지로만 구성, 불필요한 리다이렉트 등) → ADVoost 혜택을 받기 어려움</li>
+          <li><strong>파워링크 광고주에게 SEO는 이제 선택이 아닌 필수</strong></li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">ADVoost 확장검색 성과 데이터 (기존 정확매칭 대비)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>지표</th><th>변화</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CPC</td><td style="color:#e74c3c;font-weight:700;">↓ 400%</td></tr>
+              <tr><td>CTR</td><td style="color:#03C75A;font-weight:700;">↑ 340%</td></tr>
+              <tr><td>ROI</td><td style="color:#03C75A;font-weight:700;">↑ 430%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Voost Page — 랜딩페이지 SEO 최적화 7단계</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>단계</th><th>항목</th><th>설명</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>크롤링 허용</strong></td><td>robots.txt에서 Yeti(네이버 크롤러) 접근 허용 설정</td></tr>
+              <tr><td>2</td><td><strong>Fragment URL 제거</strong></td><td><code>#</code> 기반 URL은 크롤러가 읽기 어려움 → 제거 권장</td></tr>
+              <tr><td>3</td><td><strong>리다이렉트 점검</strong></td><td>불필요한 리다이렉트 제거, 최종 URL 직접 연결</td></tr>
+              <tr><td>4</td><td><strong>브랜드 키워드 제목 태그 포함</strong></td><td><code>&lt;title&gt;</code> 태그에 핵심 키워드 포함</td></tr>
+              <tr><td>5</td><td><strong>Meta Description 문장형 작성</strong></td><td>키워드 나열이 아닌 자연스러운 문장으로 작성</td></tr>
+              <tr><td>6</td><td><strong>이미지·텍스트 분리</strong></td><td>텍스트를 이미지로 처리하지 말고 HTML 텍스트로 노출</td></tr>
+              <tr><td>7</td><td><strong>프리미엄 로그분석 연동</strong></td><td>네이버 광고 전환 추적 스크립트 설치</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- SECTION 6 -->
+    <section class="section" id="section6">
+      <h2 class="section-title">
+        <span class="section-num">6</span>
+        광고 최적화 지표
+      </h2>
+      <p class="text-small" style="margin-bottom:8px;">2026년 4월 기준</p>
+
+      <div class="warning-box">
+        ⚠️ <strong>품질지수(Quality Index)는 2026년에 폐지</strong>되었습니다. 아래 두 가지 신규 지표가 대체합니다.
+      </div>
+
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr><th>지표</th><th>의미</th><th>높이는 방법</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>광고연관지수</strong></td>
+              <td>검색어와 광고(소재+랜딩페이지)의 관련성 점수</td>
+              <td>키워드-소재-랜딩페이지 일관성 유지, SEO 최적화</td>
+            </tr>
+            <tr>
+              <td><strong>클릭기대지수</strong></td>
+              <td>해당 광고가 클릭될 가능성 예측 점수</td>
+              <td>소재 품질 개선, 확장소재 충실히 등록, RSA 활용</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-box" style="margin-top:16px;">
+        두 지수가 높을수록:<br />
+        <ul class="bullet-list" style="margin-top:8px;">
+          <li>동일 입찰가 대비 더 높은 순위 확보 가능</li>
+          <li>실질적인 CPC 절감 효과</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Next Page -->
+    <div style="margin-top:40px;padding:24px;background:var(--bg-alt);border-radius:var(--radius);border:1px solid var(--border);text-align:center;">
+      <p style="margin-bottom:14px;font-weight:600;color:var(--text);">파워링크 개념을 이해했다면, 다음 단계로 이동하세요.</p>
+      <a href="powerlink-api.html" class="hero-cta" style="display:inline-flex;">API로 세팅 및 운영하기 →</a>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    API 공식 문서: <a href="https://naver.github.io/searchad-apidoc" target="_blank">naver.github.io/searchad-apidoc</a>
+    &nbsp;|&nbsp;
+    광고 시스템: <a href="https://ads.naver.com/sa" target="_blank">ads.naver.com/sa</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
