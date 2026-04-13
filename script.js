@@ -129,22 +129,22 @@ function initSearch() {
   /* --- page sets per language --- */
   const PAGE_SETS = {
     ko: [
-      { url: 'powerlink-understanding.html',  tag: '파워링크',    title: '파워링크 이해하기' },
-      { url: 'powerlink-api.html',            tag: '파워링크',    title: 'API로 세팅 및 운영하기' },
-      { url: 'shopping-understanding.html',   tag: '쇼핑검색광고', title: '쇼핑검색광고 이해하기' },
-      { url: 'shopping-api.html',             tag: '쇼핑검색광고', title: 'API로 세팅 및 운영하기' },
+      { url: 'powerlink-understanding.html',  tag: '파워링크',    title: '파워링크 이해하기',       type: 'overview' },
+      { url: 'powerlink-api.html',            tag: '파워링크',    title: 'API로 세팅 및 운영하기',  type: 'api' },
+      { url: 'shopping-understanding.html',   tag: '쇼핑검색광고', title: '쇼핑검색광고 이해하기',   type: 'overview' },
+      { url: 'shopping-api.html',             tag: '쇼핑검색광고', title: 'API로 세팅 및 운영하기',  type: 'api' },
     ],
     en: [
-      { url: 'powerlink-understanding-en.html',  tag: 'Powerlink',           title: 'Powerlink Overview' },
-      { url: 'powerlink-api-en.html',            tag: 'Powerlink',           title: 'API Setup & Operations' },
-      { url: 'shopping-understanding-en.html',   tag: 'Shopping Search Ads', title: 'Shopping Search Ads Overview' },
-      { url: 'shopping-api-en.html',             tag: 'Shopping Search Ads', title: 'API Setup & Operations' },
+      { url: 'powerlink-understanding-en.html',  tag: 'Powerlink',           title: 'Powerlink Overview',          type: 'overview' },
+      { url: 'powerlink-api-en.html',            tag: 'Powerlink',           title: 'API Setup & Operations',       type: 'api' },
+      { url: 'shopping-understanding-en.html',   tag: 'Shopping Search Ads', title: 'Shopping Search Ads Overview', type: 'overview' },
+      { url: 'shopping-api-en.html',             tag: 'Shopping Search Ads', title: 'API Setup & Operations',       type: 'api' },
     ],
     zh: [
-      { url: 'powerlink-understanding-zh.html',  tag: 'Powerlink',  title: 'Powerlink概念介绍' },
-      { url: 'powerlink-api-zh.html',            tag: 'Powerlink',  title: 'API设置与运营' },
-      { url: 'shopping-understanding-zh.html',   tag: '购物搜索广告', title: '购物搜索广告概念介绍' },
-      { url: 'shopping-api-zh.html',             tag: '购物搜索广告', title: 'API设置与运营' },
+      { url: 'powerlink-understanding-zh.html',  tag: 'Powerlink',  title: 'Powerlink概念介绍',    type: 'overview' },
+      { url: 'powerlink-api-zh.html',            tag: 'Powerlink',  title: 'API设置与运营',        type: 'api' },
+      { url: 'shopping-understanding-zh.html',   tag: '购物搜索广告', title: '购物搜索广告概念介绍', type: 'overview' },
+      { url: 'shopping-api-zh.html',             tag: '购物搜索广告', title: 'API设置与运营',        type: 'api' },
     ],
   };
 
@@ -196,7 +196,7 @@ function initSearch() {
           h1Clone?.querySelector('.badge')?.remove();
           const pageTitle = h1Clone?.textContent.trim() || page.title;
           const pageDesc  = doc.querySelector('.page-header p')?.textContent.trim() || '';
-          entries.push({ url: page.url, tag: page.tag, title: pageTitle, text: pageDesc });
+          entries.push({ url: page.url, tag: page.tag, type: page.type, title: pageTitle, text: pageDesc });
 
           // One entry per heading
           main.querySelectorAll('h2, h3').forEach(h => {
@@ -225,13 +225,14 @@ function initSearch() {
             entries.push({
               url:  page.url + (id ? '#' + id : ''),
               tag:  page.tag,
+              type: page.type,
               title,
               text: parts.join(' ').slice(0, 400),
             });
           });
 
         } catch (_) {
-          entries.push({ url: page.url, tag: page.tag, title: page.title, text: '', _fetchFailed: true });
+          entries.push({ url: page.url, tag: page.tag, type: page.type, title: page.title, text: '', _fetchFailed: true });
         }
       }));
 
@@ -263,6 +264,46 @@ function initSearch() {
     }
   });
 
+  /* --- fuzzy helpers --- */
+
+  // Lowercase + remove all whitespace
+  function normalize(s) {
+    return String(s).toLowerCase().replace(/\s+/g, '');
+  }
+
+  // Dice bigram similarity between two strings (0 ~ 1)
+  function bigramSim(a, b) {
+    if (a.length < 2 || b.length < 2) return a === b ? 1 : 0;
+    const makeBigrams = s => {
+      const bg = [];
+      for (let i = 0; i < s.length - 1; i++) bg.push(s.slice(i, i + 2));
+      return bg;
+    };
+    const bg1 = makeBigrams(a), bg2 = makeBigrams(b);
+    const set1 = new Set(bg1);
+    let hit = 0;
+    bg2.forEach(g => { if (set1.has(g)) hit++; });
+    return (2 * hit) / (bg1.length + bg2.length);
+  }
+
+  // Returns match score: 3 = exact (after space-norm), 1 = fuzzy typo, 0 = no match
+  function fuzzyScore(haystack, needle) {
+    if (!haystack || !needle) return 0;
+    const h = normalize(haystack);
+    const n = normalize(needle);
+    if (!n) return 0;
+    if (h.includes(n)) return 3;   // exact match after stripping spaces
+    if (n.length < 3) return 0;    // too short for fuzzy
+    // Sliding window bigram match (window sizes: needle ±1)
+    for (const len of [n.length - 1, n.length, n.length + 1]) {
+      if (len < 2 || len > h.length) continue;
+      for (let i = 0; i <= h.length - len; i++) {
+        if (bigramSim(h.slice(i, i + len), n) >= 0.6) return 1;
+      }
+    }
+    return 0;
+  }
+
   /* --- search --- */
   async function runSearch(query) {
     const entries = await buildIndex();
@@ -272,13 +313,12 @@ function initSearch() {
       return;
     }
 
-    const q = query.toLowerCase();
     const results = entries
       .map(e => {
-        const tm = e.title.toLowerCase().includes(q);
-        const sm = e.text.toLowerCase().includes(q);
-        if (!tm && !sm) return null;
-        return { ...e, _score: (tm ? 3 : 0) + (sm ? 1 : 0) };
+        const ts = fuzzyScore(e.title, query);
+        const ss = fuzzyScore(e.text,  query);
+        if (!ts && !ss) return null;
+        return { ...e, _score: ts + ss * 0.4 };
       })
       .filter(Boolean)
       .sort((a, b) => b._score - a._score)
@@ -297,8 +337,12 @@ function initSearch() {
     const items = results.map(r => {
       const raw     = r.text ? r.text.slice(0, 160) + (r.text.length > 160 ? '…' : '') : '';
       const snippet = raw ? `<span class="srp-snippet">${hlEsc(raw, query)}</span>` : '';
+      const typeIcon = r.type === 'api' ? '⚙️ API' : '📖';
       return `<a href="${r.url}" class="srp-item">
-        <span class="srp-tag">${esc(r.tag)}</span>
+        <div class="srp-tags">
+          <span class="srp-tag">${esc(r.tag)}</span>
+          <span class="srp-type srp-type--${r.type || 'overview'}">${typeIcon}</span>
+        </div>
         <span class="srp-title">${hlEsc(r.title, query)}</span>
         ${snippet}
       </a>`;
@@ -318,9 +362,20 @@ function initSearch() {
   }
 
   function hlEsc(text, query) {
-    const re    = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    const parts = String(text).split(re);
-    return parts.map((p, i) => i % 2 === 1 ? `<mark>${esc(p)}</mark>` : esc(p)).join('');
+    const safeQ = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // 1) Try original query
+    const re1 = new RegExp(`(${safeQ(query)})`, 'gi');
+    if (re1.test(text)) {
+      return String(text).split(re1).map((p, i) => i % 2 === 1 ? `<mark>${esc(p)}</mark>` : esc(p)).join('');
+    }
+    // 2) Try space-normalized query (handles "광고 그룹" ↔ "광고그룹")
+    const normQ = normalize(query);
+    const re2 = new RegExp(`(${safeQ(normQ)})`, 'gi');
+    if (re2.test(text)) {
+      return String(text).split(re2).map((p, i) => i % 2 === 1 ? `<mark>${esc(p)}</mark>` : esc(p)).join('');
+    }
+    // 3) Fuzzy match — show text without highlight
+    return esc(text);
   }
 }
 

@@ -986,9 +986,16 @@ pre[class*="language-"] {
 .srp-item:last-child { border-bottom: none; }
 .srp-item:hover { background: var(--green-light); text-decoration: none; }
 
-.srp-tag {
+.srp-tags {
   grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
   align-self: center;
+}
+
+.srp-tag {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .5px;
@@ -998,7 +1005,24 @@ pre[class*="language-"] {
   padding: 3px 8px;
   border-radius: 4px;
   white-space: nowrap;
-  margin-top: 2px;
+}
+
+.srp-type {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.srp-type--overview {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.srp-type--api {
+  background: #fff3e0;
+  color: #c05c00;
 }
 
 .srp-title {
