@@ -54,7 +54,8 @@
 <header class="page-header">
   <div class="badge">效果型展示广告 · API</div>
   <h1>API设置与运营</h1>
-  <p>结合curl示例，从效果型展示广告（GFA）API的权限申请、认证、广告账户·广告系列·素材管理、成效查询到潜在客户定向管理，逐步进行说明。</p>
+  <p>结合curl示例，从效果型展示广告（GFA）API的权限申请、认证、广告账户·广告系列·素材管理、素材创建与上传、ADVoost购物（PMAX）广告系列运营、成效查询到潜在客户定向管理，逐步进行说明。</p>
+  <p class="text-small" style="margin-top:10px;">最新更新：以2026年8月26日平台更新为准</p>
 </header>
 
 <!-- Content Wrapper -->
@@ -72,9 +73,13 @@
       <li><a href="#ch6">CH 6. 广告结构API</a></li>
       <li class="sub"><a href="#campaign">广告系列创建</a></li>
       <li class="sub"><a href="#objective">广告系列目的</a></li>
+      <li class="sub"><a href="#creative">素材创建 &amp; 上传</a></li>
+      <li class="sub"><a href="#pmax">ADVoost购物（PMAX）</a></li>
       <li><a href="#ch7">CH 7. 成效查询API</a></li>
+      <li class="sub"><a href="#spend">按账户提取消耗金额</a></li>
       <li><a href="#ch8">CH 8. 潜在客户管理API</a></li>
       <li><a href="#ch9">CH 9. 运营参考 &amp; FAQ</a></li>
+      <li><a href="#ch10">CH 10. 更新记录</a></li>
     </ul>
   </aside>
 
@@ -135,19 +140,42 @@
         支持范围 &amp; 限制事项
       </h2>
 
-      <div class="warning-box">
-        ⚠️ <strong>AdVoost购物不支持通过API运营。</strong><br />
-        GFA API可管理效果型展示广告的广告账户·广告系列·素材·成效·定向，但<strong>AdVoost购物商品不属于API联动对象。</strong>该商品需在广告管理平台（UI）中直接运营。
+      <div class="highlight-box">
+        🆕 <strong>自2026年8月26日起，ADVoost购物（PMAX）广告系列也可通过API运营。</strong><br />
+        现有广告系列API支持ADVoost购物广告系列的<strong>创建·查询·修改·ON/OFF·删除</strong>，并同时提供<strong>资产组单位的成效查询</strong>。由此可将GFA与ADVoost购物纳入同一套API体系运营。
       </div>
 
       <div class="subsection">
         <h3 class="subsection-title">通过API可以做的事</h3>
         <ul class="bullet-list">
-          <li>广告账户列表·信息查询（含权限级别）</li>
-          <li>广告系列 · 广告组(adSet) · 素材(creative) 的创建·修改·查询</li>
-          <li>实时成效查询（账户/广告系列/广告组/素材单位）</li>
-          <li>潜在客户定向（客户文件等）管理</li>
+          <li>广告账户 · 管理账户列表/信息查询（含权限级别）</li>
+          <li>广告系列 · 广告组(adSet) · 素材(creative) 的创建·修改·查询·删除·ON/OFF</li>
+          <li><strong>广告素材创建API</strong> — 图片横幅 / 原生图片 / 合集 / 视频 <span class="text-small">（2026.05.27 新增）</span></li>
+          <li><strong>图片·视频上传API</strong> <span class="text-small">（2026.05.27 新增）</span></li>
+          <li><strong>ADVoost购物（PMAX）广告系列创建·管理</strong> <span class="text-small">（2026.08.26 新增）</span></li>
+          <li>成效查询 — 历史 / 实时 / 转化，<strong>素材层级 + 资产组层级</strong></li>
+          <li>潜在客户定向（客户文件）管理</li>
         </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">目前API仍无法做的事</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>项目</th><th>当前状态</th><th>替代方案</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>广告账户余额 · 充值 · 退款查询</td><td>不支持</td><td>广告管理平台（UI）</td></tr>
+              <tr><td>结算（账单）金额 · 税务发票查询</td><td>不支持</td><td>广告管理平台（UI）</td></tr>
+              <tr><td>管理账户下全部广告账户的合并报表</td><td>不支持</td><td>查询广告账户列表后<strong>按账户循环调用</strong></td></tr>
+              <tr><td>成效汇总单位 <code>adAccounts</code></td><td>不支持 — 最小汇总单位为<strong>广告系列</strong></td><td>按广告系列查询后合计</td></tr>
+              <tr><td>资产组及其下级要素的创建·修改</td><td>不支持 — 仅可查询成效</td><td>广告管理平台（UI）</td></tr>
+              <tr><td>超过100MB的视频上传</td><td>不支持</td><td>在广告管理平台（UI）中直接上传</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">按广告账户提取消耗金额的方法请参考 <a href="#spend">CH 7 — 按账户提取消耗金额</a>。</p>
       </div>
     </section>
 
@@ -186,6 +214,7 @@
               <tr><td>广告系列</td><td><code>campaign</code></td><td>广告目的(objective)单位</td></tr>
               <tr><td>广告组</td><td><code>adSet</code></td><td>定向·预算·版位策略单位</td></tr>
               <tr><td>素材</td><td><code>creative</code></td><td>实际展示的广告素材</td></tr>
+              <tr><td>资产组</td><td><code>assetGroup</code></td><td>ADVoost购物（PMAX）广告系列的素材·商品组合单位</td></tr>
             </tbody>
           </table>
         </div>
@@ -314,11 +343,13 @@
               <tr><td><code>WATCH_VIDEO</code></td><td>视频观看</td></tr>
               <tr><td><code>CATALOG</code></td><td>目录销售</td></tr>
               <tr><td><code>SHOPPING</code></td><td>购物推广</td></tr>
+              <tr><td><code>LEAD</code></td><td>潜在客户开发 — 不使用转化追踪对象(<code>conversionUrlNo</code>)</td></tr>
+              <tr><td><code>PMAX</code></td><td><strong>ADVoost购物</strong>（2026.08.26 新增）</td></tr>
             </tbody>
           </table>
         </div>
         <div class="warning-box">
-          ⚠️ <strong>AdVoost购物不支持API运营。</strong>上述<code>SHOPPING</code>目的是与AdVoost购物无关的独立项目，而AdVoost购物商品本身无法通过API运营。
+          ⚠️ <code>SHOPPING</code>（购物推广）与<code>PMAX</code>（ADVoost购物）是<strong>两个不同的广告系列目的</strong>。ADVoost购物广告系列使用<code>PMAX</code>，其预算填写方式与成效查询路径也不同。请参考下方<a href="#pmax">ADVoost购物（PMAX）广告系列</a>。
         </div>
       </div>
 
@@ -327,6 +358,72 @@
         <ul class="bullet-list">
           <li><code>SINGLE_IMAGE</code> (原生图片) · <code>MULTIPLE_IMAGE</code> (合集) · <code>SINGLE_VIDEO</code> (视频) · <code>IMAGE_BANNER</code> (图片横幅) · <code>CATALOG</code> (目录)</li>
         </ul>
+      </div>
+
+      <!-- 素材创建 & 上传 -->
+      <div class="subsection" id="creative">
+        <h3 class="subsection-title">素材创建API <span class="text-small">（2026.05.27 新增）</span></h3>
+        <p>此前只能在广告管理平台（UI）中完成的<strong>素材创建</strong>，现可通过API直接执行。不同素材类型对应不同端点。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>端点 (POST)</th><th>素材类型</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/IMAGE_BANNER</code></td><td>图片横幅（智能频道 / 移动DA）</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/SINGLE_IMAGE</code></td><td>原生图片（信息流 / 横幅）</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/MULTIPLE_IMAGE</code></td><td>图片合集</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/MULTIPLE_IMAGE_WITH_VIDEO</code></td><td>视频合集</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/NATIVE_VIDEO</code></td><td>视频（信息流 / 横幅）</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/INSTREAM_VIDEO</code></td><td>视频（插播型）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">支持的模板(<code>creativeTemplateCode</code>)示例：<code>NATIVE_SINGLE_IMAGE_V2</code>、<code>NATIVE_SINGLE_IMAGE_PC</code>、<code>FEED_SINGLE_IMAGE</code>、<code>FEED_SINGLE_IMAGE_SQUARE</code>、<code>FEED_SINGLE_IMAGE_2TO3</code>、<code>NATIVE_SINGLE_IMAGE_COMMUNICATION</code>、<code>NATIVE_SINGLE_VIDEO</code>、<code>FEED_SHORTFORM_VIDEO</code>、<code>FEED_SINGLE_VIDEO</code>、<code>INSTREAM_VIDEO</code></p>
+        <div class="warning-box">
+          ⚠️ 创建原生图片 · 合集 · 视频素材前，需先在<strong>广告账户管理 &gt; 档案管理</strong>中注册档案(profile)。
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">图片 · 视频上传API <span class="text-small">（2026.05.27 新增）</span></h3>
+        <p>先上传素材创建所需的文件，再将响应中返回的ID用作素材创建API的<code>imageNo</code> · <code>videoNo</code> · <code>thumbnailImageNo</code>参数。</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>端点 (POST)</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/image</code></td><td>图片上传</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/video</code></td><td>视频上传（支持回调）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="bullet-list">
+          <li>每个广告账户<strong>同时仅可调用1次</strong></li>
+          <li>视频文件最大<strong>100MB</strong> — 超出部分请在广告管理平台（UI）中直接上传</li>
+          <li>注册<code>callbackUrl</code>后可接收上传·编码完成/失败的通知</li>
+        </ul>
+      </div>
+
+      <!-- ADVoost购物 (PMAX) -->
+      <div class="subsection" id="pmax">
+        <h3 class="subsection-title">ADVoost购物（PMAX）广告系列 <span class="text-small">（2026.08.26 新增）</span></h3>
+        <p>在现有广告系列API中，以广告系列目的<code>PMAX</code>执行ADVoost购物广告系列的<strong>创建 · 查询 · 修改 · ON/OFF · 删除</strong>。</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>项目</th><th>内容</th></tr></thead>
+            <tbody>
+              <tr><td>预算填写</td><td><code>performanceMax.budget</code>（日预算）— 不使用原有的<code>spendLimit</code>，即使填写也会被忽略</td></tr>
+              <tr><td>预算变更</td><td>广告系列支出上限批量变更API(<code>/campaigns/editSpendLimit</code>)的<code>campaignSpendLimit</code>值会反映到<code>performanceMax.budget</code></td></tr>
+              <tr><td>变更限制</td><td>为保护广告优化，限制为<strong>每个广告系列每2小时1次</strong></td></tr>
+              <tr><td>创建条件</td><td>必须设置转化追踪（转化脚本安装完成）且商业频道处于已审核通过状态</td></tr>
+              <tr><td>资产组</td><td>创建广告系列时<strong>按默认值（全部商品）自动生成</strong> — 商品筛选等设置变更仅可在广告系统（UI）中进行</td></tr>
+              <tr><td>使用同意</td><td>如需购物商品联动·站外广告使用同意，将<strong>自动完成同意处理</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="warning-box">
+          ⚠️ <strong>不提供资产组及其下级要素的创建·修改API。</strong>资产组<strong>仅支持成效查询</strong>（参考CH 7）。
+        </div>
       </div>
     </section>
 
@@ -340,13 +437,78 @@
       </h2>
 
       <div class="subsection">
-        <h3 class="subsection-title">实时成效查询</h3>
-        <ul class="bullet-list">
-          <li>查询特定<strong>广告账户 / 广告系列 / 广告组 / 素材</strong>的实时成效</li>
-          <li>特点是无需额外汇总即可<strong>以素材为单位</strong>提供成效数据</li>
-        </ul>
-        <p class="text-small">指标、期间等详细响应规格请参考官方文档的<a href="https://naver-ad-api.github.io/developers/api/performance" target="_blank">Performance API规格说明</a>。</p>
+        <h3 class="subsection-title">成效查询层级</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">查询层级</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>素材层级   : 广告账户 → 广告系列 → 广告组 → 素材
+资产组层级 : 广告账户 → 广告系列 → 资产组    ← ADVoost购物（PMAX），2026.08.26 新增</code></pre>
+        </div>
+        <p class="text-small">系统提供<strong>按查询单位的下级要素汇总</strong>的结果。（例：广告系列的历史成效按广告组·素材或资产组单位汇总）</p>
       </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">三种查询类型</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>类型</th><th>路径</th><th>主要参数</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>历史成效</td><td><code>/performance/past/{aggregationType}</code></td><td><code>startDate</code>、<code>endDate</code>、<code>timeUnit</code>(daily/hourly)、<code>limit</code>、<code>next</code></td></tr>
+              <tr><td>实时成效</td><td><code>/performance/realtime/creatives</code><br /><code>/performance/realtime/assetGroups</code></td><td><code>targetDate</code>(today/yesterday)、<code>since</code>、<code>timeUnit</code></td></tr>
+              <tr><td>转化成效</td><td><code>/performance/conversion/past/…</code><br /><code>/performance/conversion/realtime/…</code></td><td>同上 + 转化指标</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">历史成效的<code>aggregationType</code>：<code>campaigns</code> · <code>adSets</code> · <code>creatives</code> · <code>assetGroups</code>（2026.08.26 新增）</p>
+        <p class="text-small">实时成效可将响应中的<code>until</code>值用作下次请求的<code>since</code>，实现<strong>增量查询</strong>。</p>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">主要响应指标</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>字段</th><th>含义</th></tr></thead>
+            <tbody>
+              <tr><td><code>sales</code></td><td><strong>广告费（消耗金额）</strong></td></tr>
+              <tr><td><code>impCount</code> / <code>clickCount</code> / <code>vplayCount</code></td><td>展示数 / 点击数 / 视频播放数</td></tr>
+              <tr><td><code>convCount</code> / <code>convSales</code></td><td>转化次数 / 转化销售额</td></tr>
+              <tr><td><code>targetDate</code> / <code>hour</code></td><td>成效发生日期 / 时段（仅按小时查询时包含）</td></tr>
+              <tr><td><code>campaignNo</code> / <code>adSetNo</code> / <code>creativeNo</code> / <code>assetGroupNo</code></td><td>汇总单位ID</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">按资产组单位查询一般成效时，<code>vplayCount</code>始终返回<code>0</code>。</p>
+      </div>
+
+      <div class="subsection" id="spend">
+        <h3 class="subsection-title">按广告账户提取消耗金额</h3>
+        <p><strong>没有可一次性返回账户单位合计的端点。</strong>由于汇总单位(<code>aggregationType</code>)中没有<code>adAccounts</code>，标准做法是<strong>以广告系列单位调用广告账户端点后合计<code>sales</code></strong>。</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code># 1) 查询我的广告账户列表
+curl -X GET 'https://openapi.naver.com/v1/ad-api/1.0/adAccounts' \
+  -H 'Authorization: Bearer {访问令牌}'
+
+# 2) 按账户以广告系列单位·按日查询历史成效 → 合计 rows[].sales
+curl -X GET 'https://openapi.naver.com/v1/ad-api/1.0/adAccounts/456/performance/past/campaigns?startDate=2026-09-01&amp;endDate=2026-09-10&amp;timeUnit=daily' \
+  -H 'AccessManagerAccountNo: 123' \
+  -H 'Authorization: Bearer {访问令牌}'
+
+# 3) 账户较多时，遍历 1) 的列表并重复调用 2)</code></pre>
+        </div>
+        <div class="warning-box">
+          ⚠️ <strong>基于成效的消耗金额(<code>sales</code>)与结算·账单金额可能不同。</strong>账户余额·充值·退款、税务发票等<strong>结算信息查询API并未提供。</strong>结算口径金额需在广告管理平台（UI）中确认。
+        </div>
+      </div>
+
+      <p class="text-small">详细的请求·响应规格请参考官方文档的<a href="https://naver-ad-api.github.io/developers/api/performance" target="_blank">成效API规格说明</a>。</p>
     </section>
 
     <hr class="divider" />
@@ -396,17 +558,59 @@
           <li><strong>认证错误：</strong>请先确认访问令牌的过期/有效性、以及服务使用条款的同意时点问题</li>
           <li><strong>响应字段含义：</strong>在各API菜单中确认响应字段说明</li>
           <li><strong>管理账户权限：</strong>向管理账户下属广告账户发起请求时使用<code>AccessManagerAccountNo</code>头</li>
+          <li><strong>可以提取各账户的消耗金额吗？</strong>可以。但由于没有账户单位的合计端点，需<a href="#spend">按广告系列单位查询后合计<code>sales</code></a>。结算·账单金额查询API仍未提供。</li>
+          <li><strong>ADVoost购物也能通过API运营吗？</strong>可以。自2026年8月26日起支持<a href="#pmax">广告系列创建·管理(<code>PMAX</code>)及资产组单位成效查询</a>。但资产组本身的创建·修改仅可在UI中进行。</li>
         </ul>
-      </div>
-
-      <div class="warning-box">
-        ⚠️ <strong>再次提醒 — AdVoost购物不支持API运营。</strong>AdVoost购物商品的运营请在广告管理平台（UI）中进行。
       </div>
 
       <div class="highlight-box">
         📌 本指南以测试版为准，最新的端点·参数请查阅官方文档。<br />
         <a href="https://naver-ad-api.github.io/developers/docs/intro" target="_blank">naver-ad-api.github.io/developers</a>
       </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 10 -->
+    <section class="section" id="ch10">
+      <h2 class="section-title">
+        <span class="section-num">10</span>
+        更新记录
+      </h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>生效日</th><th>产品</th><th>变更内容</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="2">2026-08-26</td>
+              <td>效果型DA（ADVoost购物）</td>
+              <td>新增支持ADVoost购物(<code>PMAX</code>)广告系列的创建·查询·修改·ON/OFF·删除 · 新增预算字段<code>performanceMax.budget</code>（每个广告系列每2小时限改1次）</td>
+            </tr>
+            <tr>
+              <td>效果型DA</td>
+              <td>新增资产组单位成效查询 — 历史成效<code>aggregationType=assetGroups</code>、实时·转化成效专用端点、响应新增<code>assetGroupNo</code></td>
+            </tr>
+            <tr>
+              <td rowspan="2">2026-05-27</td>
+              <td>效果型DA（GFA）</td>
+              <td>新增广告素材创建API（图片横幅 / 原生图片 / 合集 / 视频）· 新增模板<code>NATIVE_SINGLE_IMAGE_COMMUNICATION</code></td>
+            </tr>
+            <tr>
+              <td>效果型DA（GFA）</td>
+              <td>新增图片·视频上传API（支持回调）· API每分钟调用次数上调50% · 客户端ID发放上限由2个扩大至5个</td>
+            </tr>
+            <tr>
+              <td>2026-05-07</td>
+              <td>保障型DA</td>
+              <td>报表查询API扩大至全部合作伙伴</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-small">来源：Naver效果型展示广告API官方发布说明（<a href="https://naver-ad-api.github.io/developers/blog" target="_blank">naver-ad-api.github.io/developers/blog</a>）及合作伙伴公告</p>
     </section>
 
   </main>

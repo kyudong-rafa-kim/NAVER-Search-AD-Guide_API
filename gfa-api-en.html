@@ -54,7 +54,8 @@
 <header class="page-header">
   <div class="badge">Performance Display Ads · API</div>
   <h1>API Setup &amp; Operations</h1>
-  <p>Step-by-step guidance with curl examples for the Performance Display Ads (GFA) API: from access requests and authentication to ad account, campaign, and creative management, performance retrieval, and audience target management.</p>
+  <p>Step-by-step guidance with curl examples for the Performance Display Ads (GFA) API: from access requests and authentication to ad account, campaign, and creative management, creative creation and asset upload, ADVoost Shopping (PMAX) campaign operations, performance retrieval, and audience target management.</p>
+  <p class="text-small" style="margin-top:10px;">Up to date as of the August 26, 2026 platform update</p>
 </header>
 
 <!-- Content Wrapper -->
@@ -72,9 +73,13 @@
       <li><a href="#ch6">CH 6. Ad Structure API</a></li>
       <li class="sub"><a href="#campaign">Campaign Creation</a></li>
       <li class="sub"><a href="#objective">Campaign Objective</a></li>
+      <li class="sub"><a href="#creative">Creative Creation &amp; Upload</a></li>
+      <li class="sub"><a href="#pmax">ADVoost Shopping (PMAX)</a></li>
       <li><a href="#ch7">CH 7. Performance API</a></li>
+      <li class="sub"><a href="#spend">Spend by Ad Account</a></li>
       <li><a href="#ch8">CH 8. Audience Management API</a></li>
       <li><a href="#ch9">CH 9. Operating Notes &amp; FAQ</a></li>
+      <li><a href="#ch10">CH 10. Release History</a></li>
     </ul>
   </aside>
 
@@ -135,19 +140,42 @@
         Scope &amp; Limitations
       </h2>
 
-      <div class="warning-box">
-        ⚠️ <strong>AdVoost Shopping is not supported via the API.</strong><br />
-        With the GFA API you can manage the ad accounts, campaigns, creatives, performance, and targets of performance display ads, but <strong>AdVoost Shopping products are not eligible for API integration.</strong> Those products must be operated directly in the ad management platform (UI).
+      <div class="highlight-box">
+        🆕 <strong>As of August 26, 2026, ADVoost Shopping (PMAX) campaigns can also be operated via the API.</strong><br />
+        The existing Campaign API now supports <strong>create, read, update, ON/OFF, and delete</strong> for ADVoost Shopping campaigns, along with <strong>asset-group-level performance retrieval</strong>. GFA and ADVoost Shopping can now be run through a single API system.
       </div>
 
       <div class="subsection">
         <h3 class="subsection-title">What You Can Do with the API</h3>
         <ul class="bullet-list">
-          <li>Query ad account lists and information (including permission levels)</li>
-          <li>Create, update, and query campaigns, ad groups (adSet), and creatives (creative)</li>
-          <li>Retrieve real-time performance (at the account/campaign/ad group/creative level)</li>
-          <li>Manage audience targets (customer files, etc.)</li>
+          <li>Query ad account and manager account lists/details (including permission levels)</li>
+          <li>Create, update, query, delete, and toggle ON/OFF campaigns, ad groups (adSet), and creatives</li>
+          <li><strong>Creative creation API</strong> — image banner / native image / collection / video <span class="text-small">(new in 2026.05.27)</span></li>
+          <li><strong>Image and video upload API</strong> <span class="text-small">(new in 2026.05.27)</span></li>
+          <li><strong>ADVoost Shopping (PMAX) campaign creation and management</strong> <span class="text-small">(new in 2026.08.26)</span></li>
+          <li>Performance retrieval — past / real-time / conversion, across the <strong>creative hierarchy and the asset group hierarchy</strong></li>
+          <li>Manage audience targets (customer files)</li>
         </ul>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">What the API Still Cannot Do</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Item</th><th>Status</th><th>Workaround</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Ad account balance, top-up, refund lookup</td><td>Not supported</td><td>Ad management platform (UI)</td></tr>
+              <tr><td>Settlement (billing) amounts, tax invoices</td><td>Not supported</td><td>Ad management platform (UI)</td></tr>
+              <tr><td>Consolidated report across all ad accounts under a manager account</td><td>Not supported</td><td>List ad accounts, then <strong>call per account in a loop</strong></td></tr>
+              <tr><td>Aggregation type <code>adAccounts</code></td><td>Not supported — the smallest aggregation unit is <strong>campaign</strong></td><td>Query at campaign level and sum</td></tr>
+              <tr><td>Creating or editing asset groups and their child elements</td><td>Not supported — retrieval of performance only</td><td>Ad management platform (UI)</td></tr>
+              <tr><td>Video uploads larger than 100MB</td><td>Not supported</td><td>Upload directly in the ad management platform (UI)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">For how to extract spend by ad account, see <a href="#spend">CH 7 — Spend by Ad Account</a>.</p>
       </div>
     </section>
 
@@ -186,6 +214,7 @@
               <tr><td>Campaign</td><td><code>campaign</code></td><td>The advertising objective (objective) unit</td></tr>
               <tr><td>Ad group</td><td><code>adSet</code></td><td>The targeting/budget/placement strategy unit</td></tr>
               <tr><td>Creative</td><td><code>creative</code></td><td>The actual ad creative that is shown</td></tr>
+              <tr><td>Asset group</td><td><code>assetGroup</code></td><td>The bundle of creatives/items in an ADVoost Shopping (PMAX) campaign</td></tr>
             </tbody>
           </table>
         </div>
@@ -314,11 +343,13 @@
               <tr><td><code>WATCH_VIDEO</code></td><td>Video Views</td></tr>
               <tr><td><code>CATALOG</code></td><td>Catalog Sales</td></tr>
               <tr><td><code>SHOPPING</code></td><td>Shopping Promotion</td></tr>
+              <tr><td><code>LEAD</code></td><td>Lead Generation — does not use <code>conversionUrlNo</code></td></tr>
+              <tr><td><code>PMAX</code></td><td><strong>ADVoost Shopping</strong> (new in 2026.08.26)</td></tr>
             </tbody>
           </table>
         </div>
         <div class="warning-box">
-          ⚠️ <strong>AdVoost Shopping is not supported via the API.</strong> The <code>SHOPPING</code> objective above is a separate item unrelated to AdVoost Shopping, and AdVoost Shopping products themselves cannot be operated via the API.
+          ⚠️ <code>SHOPPING</code> (Shopping Promotion) and <code>PMAX</code> (ADVoost Shopping) are <strong>two different campaign objectives</strong>. ADVoost Shopping campaigns use <code>PMAX</code>, with a different budget field and performance retrieval path. See <a href="#pmax">ADVoost Shopping (PMAX) Campaigns</a> below.
         </div>
       </div>
 
@@ -327,6 +358,72 @@
         <ul class="bullet-list">
           <li><code>SINGLE_IMAGE</code> (native image) · <code>MULTIPLE_IMAGE</code> (collection) · <code>SINGLE_VIDEO</code> (video) · <code>IMAGE_BANNER</code> (image banner) · <code>CATALOG</code> (catalog)</li>
         </ul>
+      </div>
+
+      <!-- Creative creation & upload -->
+      <div class="subsection" id="creative">
+        <h3 class="subsection-title">Creative Creation API <span class="text-small">(new in 2026.05.27)</span></h3>
+        <p>Creative creation, which previously was only possible in the ad management platform (UI), can now be done directly through the API. Each creative type has its own endpoint.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Endpoint (POST)</th><th>Creative Type</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/IMAGE_BANNER</code></td><td>Image banner (Smart Channel / Mobile DA)</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/SINGLE_IMAGE</code></td><td>Native image (feed / banner)</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/MULTIPLE_IMAGE</code></td><td>Image collection</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/MULTIPLE_IMAGE_WITH_VIDEO</code></td><td>Video collection</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/NATIVE_VIDEO</code></td><td>Video (feed / banner)</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/INSTREAM_VIDEO</code></td><td>Video (in-stream)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">Supported templates (<code>creativeTemplateCode</code>): <code>NATIVE_SINGLE_IMAGE_V2</code>, <code>NATIVE_SINGLE_IMAGE_PC</code>, <code>FEED_SINGLE_IMAGE</code>, <code>FEED_SINGLE_IMAGE_SQUARE</code>, <code>FEED_SINGLE_IMAGE_2TO3</code>, <code>NATIVE_SINGLE_IMAGE_COMMUNICATION</code>, <code>NATIVE_SINGLE_VIDEO</code>, <code>FEED_SHORTFORM_VIDEO</code>, <code>FEED_SINGLE_VIDEO</code>, <code>INSTREAM_VIDEO</code></p>
+        <div class="warning-box">
+          ⚠️ To create native image, collection, or video creatives, a profile must first be registered under <strong>Ad Account Management &gt; Profile Management</strong>.
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Image &amp; Video Upload API <span class="text-small">(new in 2026.05.27)</span></h3>
+        <p>Upload the files to be used in a creative first, then pass the returned ID to the creative creation API as <code>imageNo</code>, <code>videoNo</code>, or <code>thumbnailImageNo</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Endpoint (POST)</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/image</code></td><td>Image upload</td></tr>
+              <tr><td><code>/adAccounts/{adAccountNo}/creatives/video</code></td><td>Video upload (callback supported)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="bullet-list">
+          <li>Only <strong>one concurrent call</strong> per ad account</li>
+          <li>Videos up to <strong>100MB</strong> — larger files must be uploaded directly in the ad management platform (UI)</li>
+          <li>Register a <code>callbackUrl</code> to be notified when upload/encoding completes or fails</li>
+        </ul>
+      </div>
+
+      <!-- ADVoost Shopping (PMAX) -->
+      <div class="subsection" id="pmax">
+        <h3 class="subsection-title">ADVoost Shopping (PMAX) Campaigns <span class="text-small">(new in 2026.08.26)</span></h3>
+        <p>Use the existing Campaign API with the campaign objective <code>PMAX</code> to <strong>create, read, update, toggle ON/OFF, and delete</strong> ADVoost Shopping campaigns.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Details</th></tr></thead>
+            <tbody>
+              <tr><td>Budget input</td><td><code>performanceMax.budget</code> (daily budget) — the existing <code>spendLimit</code> is not used and is ignored if provided</td></tr>
+              <tr><td>Budget change</td><td>The <code>campaignSpendLimit</code> value in the bulk spend-limit API (<code>/campaigns/editSpendLimit</code>) is applied to <code>performanceMax.budget</code></td></tr>
+              <tr><td>Change limit</td><td>To protect ad optimization, limited to <strong>once every 2 hours per campaign</strong></td></tr>
+              <tr><td>Creation requirements</td><td>Conversion tracking is required (conversion script fully installed) and the business channel must be approved</td></tr>
+              <tr><td>Asset group</td><td>Automatically created with <strong>default settings (all items)</strong> at campaign creation — item filtering and other settings can only be changed in the ad system (UI)</td></tr>
+              <tr><td>Consent</td><td>Shopping product integration and off-site ad consent are <strong>handled automatically</strong> when required</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="warning-box">
+          ⚠️ <strong>No API is provided for creating or editing asset groups and their child elements.</strong> Asset groups support <strong>performance retrieval only</strong> (see CH 7).
+        </div>
       </div>
     </section>
 
@@ -340,13 +437,78 @@
       </h2>
 
       <div class="subsection">
-        <h3 class="subsection-title">Real-Time Performance Retrieval</h3>
-        <ul class="bullet-list">
-          <li>Retrieve the real-time performance of a specific <strong>ad account / campaign / ad group / creative</strong></li>
-          <li>A key feature is that performance data is provided at the <strong>creative level</strong> without separate aggregation</li>
-        </ul>
-        <p class="text-small">For detailed response specs such as metrics and periods, refer to the <a href="https://naver-ad-api.github.io/developers/api/performance" target="_blank">Performance API specification</a> in the official docs.</p>
+        <h3 class="subsection-title">Performance Hierarchies</h3>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">Hierarchy</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-text"><code>Creative hierarchy   : Ad account → Campaign → Ad group → Creative
+Asset group hierarchy: Ad account → Campaign → Asset group   ← ADVoost Shopping (PMAX), added 2026.08.26</code></pre>
+        </div>
+        <p class="text-small">Results are <strong>aggregated at a level below the queried unit</strong>. (e.g., past performance of a campaign is aggregated by ad group, creative, or asset group.)</p>
       </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Three Retrieval Types</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Type</th><th>Path</th><th>Key Parameters</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Past performance</td><td><code>/performance/past/{aggregationType}</code></td><td><code>startDate</code>, <code>endDate</code>, <code>timeUnit</code> (daily/hourly), <code>limit</code>, <code>next</code></td></tr>
+              <tr><td>Real-time performance</td><td><code>/performance/realtime/creatives</code><br /><code>/performance/realtime/assetGroups</code></td><td><code>targetDate</code> (today/yesterday), <code>since</code>, <code>timeUnit</code></td></tr>
+              <tr><td>Conversion performance</td><td><code>/performance/conversion/past/…</code><br /><code>/performance/conversion/realtime/…</code></td><td>Same as above + conversion metrics</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">Past performance <code>aggregationType</code>: <code>campaigns</code> · <code>adSets</code> · <code>creatives</code> · <code>assetGroups</code> (added 2026.08.26)</p>
+        <p class="text-small">For real-time performance, pass the <code>until</code> value from the response as <code>since</code> in the next request for <strong>incremental retrieval</strong>.</p>
+      </div>
+
+      <div class="subsection">
+        <h3 class="subsection-title">Key Response Metrics</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>sales</code></td><td><strong>Ad spend</strong></td></tr>
+              <tr><td><code>impCount</code> / <code>clickCount</code> / <code>vplayCount</code></td><td>Impressions / clicks / video plays</td></tr>
+              <tr><td><code>convCount</code> / <code>convSales</code></td><td>Conversions / conversion revenue</td></tr>
+              <tr><td><code>targetDate</code> / <code>hour</code></td><td>Performance date / hour (included only for hourly queries)</td></tr>
+              <tr><td><code>campaignNo</code> / <code>adSetNo</code> / <code>creativeNo</code> / <code>assetGroupNo</code></td><td>Aggregation unit IDs</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-small">For asset-group-level general performance, <code>vplayCount</code> is always returned as <code>0</code>.</p>
+      </div>
+
+      <div class="subsection" id="spend">
+        <h3 class="subsection-title">Extracting Spend by Ad Account</h3>
+        <p><strong>There is no endpoint that returns an account-level total directly.</strong> Because <code>adAccounts</code> is not available as an <code>aggregationType</code>, the standard approach is to <strong>call the ad account endpoint at campaign level and sum <code>sales</code></strong>.</p>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="lang-label">bash / curl</span>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <pre class="language-bash"><code># 1) List my ad accounts
+curl -X GET 'https://openapi.naver.com/v1/ad-api/1.0/adAccounts' \
+  -H 'Authorization: Bearer {access token}'
+
+# 2) Query past performance per account, by campaign and by day → sum rows[].sales
+curl -X GET 'https://openapi.naver.com/v1/ad-api/1.0/adAccounts/456/performance/past/campaigns?startDate=2026-09-01&amp;endDate=2026-09-10&amp;timeUnit=daily' \
+  -H 'AccessManagerAccountNo: 123' \
+  -H 'Authorization: Bearer {access token}'
+
+# 3) For multiple accounts, iterate the list from 1) and repeat 2)</code></pre>
+        </div>
+        <div class="warning-box">
+          ⚠️ <strong>Performance-based spend (<code>sales</code>) may differ from settlement/billing amounts.</strong> <strong>No API is provided for settlement data</strong> such as account balance, top-ups, refunds, or tax invoices. Settlement amounts must be checked in the ad management platform (UI).
+        </div>
+      </div>
+
+      <p class="text-small">For detailed request/response specs, refer to the <a href="https://naver-ad-api.github.io/developers/api/performance" target="_blank">Performance API specification</a> in the official docs.</p>
     </section>
 
     <hr class="divider" />
@@ -396,17 +558,59 @@
           <li><strong>Authentication errors:</strong> First check access token expiration/validity and the timing of service terms agreement</li>
           <li><strong>Response field meanings:</strong> Check the response field descriptions in each API menu</li>
           <li><strong>Manager account permissions:</strong> Use the <code>AccessManagerAccountNo</code> header when making requests to ad accounts under a management account</li>
+          <li><strong>Can I extract spend per ad account?</strong> Yes. There is no account-level total endpoint, so you must <a href="#spend">query at campaign level and sum <code>sales</code></a>. An API for settlement/billing amounts is still not provided.</li>
+          <li><strong>Does the API support ADVoost Shopping?</strong> Yes. Since August 26, 2026, <a href="#pmax">campaign creation/management (<code>PMAX</code>) and asset-group-level performance retrieval</a> are supported. Asset groups themselves can only be created or edited in the UI.</li>
         </ul>
-      </div>
-
-      <div class="warning-box">
-        ⚠️ <strong>Once again — AdVoost Shopping is not supported via the API.</strong> Operate AdVoost Shopping products in the ad management platform (UI).
       </div>
 
       <div class="highlight-box">
         📌 This guide is based on the beta version; check the official docs for the latest endpoints and parameters.<br />
         <a href="https://naver-ad-api.github.io/developers/docs/intro" target="_blank">naver-ad-api.github.io/developers</a>
       </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- CH 10 -->
+    <section class="section" id="ch10">
+      <h2 class="section-title">
+        <span class="section-num">10</span>
+        Release History
+      </h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Effective</th><th>Product</th><th>Changes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="2">2026-08-26</td>
+              <td>Performance DA (ADVoost Shopping)</td>
+              <td>ADVoost Shopping (<code>PMAX</code>) campaign create/read/update/ON-OFF/delete newly supported · budget field <code>performanceMax.budget</code> added (changes limited to once every 2 hours per campaign)</td>
+            </tr>
+            <tr>
+              <td>Performance DA</td>
+              <td>Asset-group-level performance retrieval added — past performance <code>aggregationType=assetGroups</code>, dedicated real-time and conversion endpoints, <code>assetGroupNo</code> added to responses</td>
+            </tr>
+            <tr>
+              <td rowspan="2">2026-05-27</td>
+              <td>Performance DA (GFA)</td>
+              <td>Creative creation API added (image banner / native image / collection / video) · new template <code>NATIVE_SINGLE_IMAGE_COMMUNICATION</code></td>
+            </tr>
+            <tr>
+              <td>Performance DA (GFA)</td>
+              <td>Image and video upload API added (callback supported) · API calls per minute raised by 50% · client ID issuance limit raised from 2 to 5</td>
+            </tr>
+            <tr>
+              <td>2026-05-07</td>
+              <td>Guaranteed DA</td>
+              <td>Report retrieval API extended to all partners</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-small">Sources: official Naver Performance Display Ads API release notes (<a href="https://naver-ad-api.github.io/developers/blog" target="_blank">naver-ad-api.github.io/developers/blog</a>) and partner notices</p>
     </section>
 
   </main>
